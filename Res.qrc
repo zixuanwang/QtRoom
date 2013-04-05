@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/new/my_resources">
+        <file>house_home.png</file>
+        <file>go-next-4.png</file>
+        <file>placeholder.png</file>
+        <file>haarcascade_upperbody.xml</file>
+        <file>document-new-5.png</file>
+        <file>media-playback-stop.png</file>
+        <file>media-record.png</file>
+    </qresource>
+</RCC>
