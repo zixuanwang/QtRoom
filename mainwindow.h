@@ -4,13 +4,19 @@
 #include "Camera.h"
 #include "HaarDetector.h"
 #include <memory>
+#include <QDate>
+#include <QGridLayout>
 #include <QMainWindow>
 #include <QLabel>
 #include <QtWidgets/QFileDialog>
+#include <QTime>
 #include <QTimer>
 #include <QToolBar>
 #include <unordered_map>
 #include "Utility.h"
+
+#define THUMBNAIL_WIDTH 320
+#define THUMBNAIL_HEIGHT 240
 
 namespace Ui {
 class MainWindow;
@@ -33,16 +39,25 @@ public slots:
 private:
     void init_menubar();
     void init_toolbar();
+    void init_widgets();
     void init_statusbar();
+    void init_timers();
     cv::Mat process_image(cv::Mat& image);
     Ui::MainWindow *ui;
     std::unordered_map<std::string, std::shared_ptr<Camera> > m_camera_map;
-    std::unordered_map<std::string, QLabel*> m_label_map;
+    std::unordered_map<std::string, std::shared_ptr<QLabel> > m_label_map;
     std::shared_ptr<PeopleDetector> m_pdetector;
     std::string m_video_directory;
-    QTimer *m_status_timer;
-    QAction* m_action_start_recording;
-    QAction* m_action_stop_recording;
+
+
+    // UI widgets
+    std::shared_ptr<QGridLayout> m_gridlayout;
+    std::vector<std::shared_ptr<QLabel> > m_label_vector;
+    std::shared_ptr<QAction> m_action_load_config;
+    std::shared_ptr<QAction> m_action_start_recording;
+    std::shared_ptr<QAction> m_action_stop_recording;
+    std::shared_ptr<QTimer> m_status_timer;
+    std::shared_ptr<QLabel> m_status_label;
 };
 
 #endif // MAINWINDOW_H

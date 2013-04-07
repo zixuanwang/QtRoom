@@ -30,9 +30,13 @@ size_t Camera::frame_producer(void* ptr, size_t size, size_t nmemb){
 		std::unique_lock<std::mutex> lock(m_queue_mutex);
         m_buffer_queue.push_back(image);        
         if(m_is_recording){// save frame if recording
-            m_video_writer << image;
-            auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
-            m_timestamp_stream << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << std::endl;
+            try{
+                m_video_writer << image;
+                auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+                m_timestamp_stream << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << std::endl;
+            }catch(cv::Exception& e){
+                std::cerr << e.what() << std::endl;
+            }
         }
         emit image_changed(m_ip_address.c_str());
 	}	
@@ -91,8 +95,10 @@ void Camera::run(){
 
 void Camera::fetch_frame(cv::Mat& image){
     std::unique_lock<std::mutex> lock(m_queue_mutex);
-    image = m_buffer_queue.front();
-    m_buffer_queue.pop_front();
+    if(!m_buffer_queue.empty()){
+        image = m_buffer_queue.front();
+        m_buffer_queue.pop_front();
+    }
 }
 
 void Camera::start_recording(const std::string& output_dir){

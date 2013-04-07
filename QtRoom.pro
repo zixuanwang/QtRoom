@@ -17,15 +17,22 @@ SOURCES += main.cpp\
     Camera.cpp \
     Utility.cpp \
     PeopleDetector.cpp \
-    HaarDetector.cpp
+    HaarDetector.cpp \
+    Annotate.cpp \
+    CameraWindow.cpp \
+    CameraView.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
     Utility.h \
     PeopleDetector.h \
-    HaarDetector.h
+    HaarDetector.h \
+    Annotate.h \
+    CameraWindow.h \
+    CameraView.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    CameraWindow.ui
 
 # change the following
 

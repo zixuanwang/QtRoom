@@ -7,11 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     init_menubar();
     init_toolbar();
+    init_widgets();
     init_statusbar();
-    // set the timer to update the status bar.
-    m_status_timer = new QTimer(this);
-    m_status_timer->setInterval(1000);
-    connect(m_status_timer, SIGNAL(timeout()), this, SLOT(status_timer_timeout()));
+    init_timers();
 }
 
 MainWindow::~MainWindow()
@@ -30,23 +28,51 @@ void MainWindow::init_toolbar(){
     QPixmap new_pix(":/new/my_resources/document-new-5.png");
     QToolBar *toolbar = addToolBar("main_toolbar");
     toolbar->setIconSize(QSize(32,32));
-    QAction* action_load_config = new QAction(QIcon(new_pix), "Load Config", this);
-    action_load_config->setShortcut(tr("Ctrl+N"));
-    connect(action_load_config, SIGNAL(triggered()), this, SLOT(pick_config()));
-    m_action_start_recording = new QAction(QIcon(start_recording_pix), "Start Recording", this);
+    m_action_load_config = std::shared_ptr<QAction>(new QAction(QIcon(new_pix), "Load Config", this));
+    m_action_load_config->setShortcut(tr("Ctrl+N"));
+    connect(m_action_load_config.get(), SIGNAL(triggered()), this, SLOT(pick_config()));
+    m_action_start_recording = std::shared_ptr<QAction>(new QAction(QIcon(start_recording_pix), "Start Recording", this));
     m_action_start_recording->setShortcut(tr("Ctrl+S"));
     m_action_start_recording->setDisabled(true);
-    connect(m_action_start_recording, SIGNAL(triggered()), this, SLOT(start_recording()));
-    m_action_stop_recording = new QAction(QIcon(stop_recording_pix), "Stop Recording", this);
+    connect(m_action_start_recording.get(), SIGNAL(triggered()), this, SLOT(start_recording()));
+    m_action_stop_recording = std::shared_ptr<QAction>(new QAction(QIcon(stop_recording_pix), "Stop Recording", this));
     m_action_stop_recording->setDisabled(true);
-    connect(m_action_stop_recording, SIGNAL(triggered()), this, SLOT(stop_recording()));
-    toolbar->addAction(action_load_config);
-    toolbar->addAction(m_action_start_recording);
-    toolbar->addAction(m_action_stop_recording);
+    connect(m_action_stop_recording.get(), SIGNAL(triggered()), this, SLOT(stop_recording()));
+    toolbar->addAction(m_action_load_config.get());
+    toolbar->addAction(m_action_start_recording.get());
+    toolbar->addAction(m_action_stop_recording.get());
+}
+
+void MainWindow::init_widgets(){
+    m_gridlayout = std::shared_ptr<QGridLayout>(new QGridLayout(this));
+    int camera_count = static_cast<int>(m_camera_map.size());
+    int row_count = 3; // 3 thumbnails per row.
+    m_label_vector.clear();
+    m_label_vector.reserve(camera_count);
+    for(int i = 0; i < camera_count; ++i){
+        std::shared_ptr<QLabel> label(new QLabel);
+        label->setFixedWidth(THUMBNAIL_WIDTH);
+        label->setFixedHeight(THUMBNAIL_HEIGHT);
+        QPixmap pix(":/new/my_resources/placeholder.png");
+        label->setPixmap(pix);
+        m_gridlayout->addWidget(label.get(), i / row_count, i % row_count);
+        m_label_vector.push_back(label);
+    }
+    centralWidget()->setLayout(m_gridlayout.get());
 }
 
 void MainWindow::init_statusbar(){
+    m_status_label = std::shared_ptr<QLabel>(new QLabel);
 
+    statusBar()->addWidget(m_status_label.get());
+}
+
+void MainWindow::init_timers(){
+    // set the timer to update the status bar.
+    m_status_timer = std::shared_ptr<QTimer>(new QTimer(this));
+    m_status_timer->setInterval(1000);
+    connect(m_status_timer.get(), SIGNAL(timeout()), this, SLOT(status_timer_timeout()));
+    m_status_timer->start();
 }
 
 void MainWindow::pick_config(){
@@ -74,17 +100,21 @@ void MainWindow::load_config(const std::string& config_path){
         getline(in_stream, password);
         // read ip_address
         std::string ip_address;
-        int line_count = 1;
         while(getline(in_stream, ip_address)){
             std::shared_ptr<Camera> p_camera(new Camera(ip_address, username, password));
             m_camera_map[ip_address] = p_camera;
             connect(p_camera.get(), SIGNAL(image_changed(QString)), this, SLOT(on_image_changed(QString)));
-            m_label_map[ip_address] = findChildren<QLabel*>("label_" + QString::number(line_count++))[0];
-            p_camera->start();
+        }
+        // create labels, and start each camera thread.
+        init_widgets();
+        int i = 0;
+        for(auto iter = m_camera_map.begin(); iter != m_camera_map.end(); ++iter, ++i){
+            m_label_map[iter->first] = m_label_vector[i];
+            iter->second->start();
         }
         in_stream.close();
     }
-    m_action_start_recording->setDisabled(false);// enable start_recording
+    m_action_start_recording->setDisabled(false);
 }
 
 void MainWindow::on_image_changed(QString ip_address){
@@ -96,7 +126,7 @@ void MainWindow::on_image_changed(QString ip_address){
 }
 
 void MainWindow::status_timer_timeout(){
-
+    m_status_label->setText(QDate::currentDate().toString() + " " + QTime::currentTime().toString());
 }
 
 cv::Mat MainWindow::process_image(cv::Mat& image){

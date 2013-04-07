@@ -1,11 +1,13 @@
+#include "CameraView.h"
 #include "mainwindow.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    
-    return a.exec();
+    QApplication app(argc, argv);
+    //MainWindow w;
+    //w.show();
+    CameraView camera;
+    camera.show();
+    return app.exec();
 }
