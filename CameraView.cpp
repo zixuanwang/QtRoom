@@ -2,11 +2,11 @@
 
 CameraView::CameraView(){
     // test
-    //m_camera = std::shared_ptr<Camera>(new Camera("171.67.88.36", "WSNLCAM", "y2e2cam"));
-    //connect(m_camera.get(), SIGNAL(image_changed(QString)), this, SLOT(image_changed()));
-    //m_camera->start();
-    m_video_capture.open("/home/zxwang/Dropbox/data/iroom/video1/171.67.83.73.avi");
-    m_type = VIDEO;
+    m_camera = std::shared_ptr<Camera>(new Camera("171.67.88.36", "WSNLCAM", "y2e2cam"));
+    connect(m_camera.get(), SIGNAL(image_changed(QString)), this, SLOT(image_changed()));
+    m_camera->start();
+    //m_video_capture.open("/home/zxwang/Dropbox/data/iroom/video1/171.67.83.73.avi");
+    //m_type = VIDEO;
 }
 
 CameraView::~CameraView(){

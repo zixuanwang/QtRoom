@@ -19,7 +19,11 @@ SOURCES += main.cpp\
     PeopleDetector.cpp \
     HaarDetector.cpp \
     CameraView.cpp \
-    Annotate.cpp
+    Annotate.cpp \
+    MotionDescriptor.cpp \
+    HoGDescriptor.cpp \
+    FeatureDescriptor.cpp \
+    ColorDescriptor.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
@@ -27,7 +31,11 @@ HEADERS  += mainwindow.h \
     PeopleDetector.h \
     HaarDetector.h \
     CameraView.h \
-    Annotate.h
+    Annotate.h \
+    MotionDescriptor.h \
+    HoGDescriptor.h \
+    FeatureDescriptor.h \
+    ColorDescriptor.h
 
 FORMS    += mainwindow.ui
 

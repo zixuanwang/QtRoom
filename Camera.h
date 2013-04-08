@@ -6,6 +6,7 @@
 #include <iostream>
 #include <mutex>
 #include <opencv2/opencv.hpp>
+#include <QDebug>
 #include <QString>
 #include <QThread>
 #include <queue>
