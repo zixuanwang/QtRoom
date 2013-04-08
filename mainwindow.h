@@ -5,10 +5,11 @@
 #include "HaarDetector.h"
 #include <memory>
 #include <QDate>
+#include <QFileDialog>
 #include <QGridLayout>
 #include <QMainWindow>
+#include <QMenuBar>
 #include <QLabel>
-#include <QtWidgets/QFileDialog>
 #include <QTime>
 #include <QTimer>
 #include <QToolBar>
@@ -32,11 +33,12 @@ public slots:
     void pick_config();
     void run_haar_detection();
     void load_config(const std::string& config_path);
-    void on_image_changed(QString ip_address);
+    void image_changed(QString ip_address);
     void status_timer_timeout();
     void start_recording();
     void stop_recording();
 private:
+    void init_actions();
     void init_menubar();
     void init_toolbar();
     void init_widgets();
@@ -56,6 +58,7 @@ private:
     std::shared_ptr<QAction> m_action_load_config;
     std::shared_ptr<QAction> m_action_start_recording;
     std::shared_ptr<QAction> m_action_stop_recording;
+    std::shared_ptr<QAction> m_action_exit;
     std::shared_ptr<QTimer> m_status_timer;
     std::shared_ptr<QLabel> m_status_label;
 };

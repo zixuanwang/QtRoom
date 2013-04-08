@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow), m_pdetector(NULL){
     ui->setupUi(this);
+    init_actions();
     init_menubar();
     init_toolbar();
     init_widgets();
@@ -17,17 +18,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::init_menubar(){
-    connect(ui->action_config, SIGNAL(triggered()), this, SLOT(pick_config()));
-    connect(ui->action_haar, SIGNAL(triggered()), this, SLOT(run_haar_detection()));
-}
-
-void MainWindow::init_toolbar(){
+void MainWindow::init_actions(){
     QPixmap start_recording_pix(":/new/my_resources/media-record.png");
     QPixmap stop_recording_pix(":/new/my_resources/media-playback-stop.png");
     QPixmap new_pix(":/new/my_resources/document-new-5.png");
-    QToolBar *toolbar = addToolBar("main_toolbar");
-    toolbar->setIconSize(QSize(32,32));
     m_action_load_config = std::shared_ptr<QAction>(new QAction(QIcon(new_pix), "Load Config", this));
     m_action_load_config->setShortcut(tr("Ctrl+N"));
     connect(m_action_load_config.get(), SIGNAL(triggered()), this, SLOT(pick_config()));
@@ -38,13 +32,29 @@ void MainWindow::init_toolbar(){
     m_action_stop_recording = std::shared_ptr<QAction>(new QAction(QIcon(stop_recording_pix), "Stop Recording", this));
     m_action_stop_recording->setDisabled(true);
     connect(m_action_stop_recording.get(), SIGNAL(triggered()), this, SLOT(stop_recording()));
+    m_action_exit = std::shared_ptr<QAction>(new QAction(tr("E&xit"), this));
+    m_action_exit->setStatusTip(tr("Exit the application"));
+    connect(m_action_exit.get(), SIGNAL(triggered()), this, SLOT(close()));
+}
+
+void MainWindow::init_menubar(){
+    QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(m_action_load_config.get());
+    fileMenu->addSeparator();
+    fileMenu->addAction(m_action_exit.get());
+    //connect(ui->action_haar, SIGNAL(triggered()), this, SLOT(run_haar_detection()));
+}
+
+void MainWindow::init_toolbar(){
+    QToolBar* toolbar = addToolBar("main_toolbar");
+    toolbar->setIconSize(QSize(32,32));
     toolbar->addAction(m_action_load_config.get());
     toolbar->addAction(m_action_start_recording.get());
     toolbar->addAction(m_action_stop_recording.get());
 }
 
 void MainWindow::init_widgets(){
-    m_gridlayout = std::shared_ptr<QGridLayout>(new QGridLayout(this));
+    m_gridlayout = std::shared_ptr<QGridLayout>(new QGridLayout);
     int camera_count = static_cast<int>(m_camera_map.size());
     int row_count = 3; // 3 thumbnails per row.
     m_label_vector.clear();
@@ -103,7 +113,7 @@ void MainWindow::load_config(const std::string& config_path){
         while(getline(in_stream, ip_address)){
             std::shared_ptr<Camera> p_camera(new Camera(ip_address, username, password));
             m_camera_map[ip_address] = p_camera;
-            connect(p_camera.get(), SIGNAL(image_changed(QString)), this, SLOT(on_image_changed(QString)));
+            connect(p_camera.get(), SIGNAL(image_changed(QString)), this, SLOT(image_changed(QString)));
         }
         // create labels, and start each camera thread.
         init_widgets();
@@ -117,7 +127,7 @@ void MainWindow::load_config(const std::string& config_path){
     m_action_start_recording->setDisabled(false);
 }
 
-void MainWindow::on_image_changed(QString ip_address){
+void MainWindow::image_changed(QString ip_address){
     std::shared_ptr<Camera> p_camera = m_camera_map[ip_address.toStdString()];
     cv::Mat image;
     p_camera->fetch_frame(image);

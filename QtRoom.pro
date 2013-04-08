@@ -18,26 +18,20 @@ SOURCES += main.cpp\
     Utility.cpp \
     PeopleDetector.cpp \
     HaarDetector.cpp \
-    Annotate.cpp \
-    CameraWindow.cpp \
-    CameraView.cpp
+    CameraView.cpp \
+    Annotate.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
     Utility.h \
     PeopleDetector.h \
     HaarDetector.h \
-    Annotate.h \
-    CameraWindow.h \
-    CameraView.h
+    CameraView.h \
+    Annotate.h
 
-FORMS    += mainwindow.ui \
-    CameraWindow.ui
+FORMS    += mainwindow.ui
 
 # change the following
-
-# add console for debugging
-CONFIG += console
 
 QMAKE_CXXFLAGS += -Wall -std=c++11
 INCLUDEPATH += /usr/local/include
