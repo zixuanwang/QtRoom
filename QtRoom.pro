@@ -43,7 +43,7 @@ FORMS    += mainwindow.ui
 
 QMAKE_CXXFLAGS += -Wall -std=c++11
 INCLUDEPATH += /usr/local/include
-LIBS += -L/usr/local/lib -lcurl -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_objdetect
+LIBS += -L/usr/local/lib -lcurl -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_objdetect -lboost_system -lboost_filesystem
 
 RESOURCES += \
     Res.qrc

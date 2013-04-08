@@ -30,13 +30,9 @@ size_t Camera::frame_producer(void* ptr, size_t size, size_t nmemb){
 		std::unique_lock<std::mutex> lock(m_queue_mutex);
         m_buffer_queue.push_back(image);        
         if(m_is_recording){// save frame if recording
-            try{
-                m_video_writer << image;
-                auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
-                m_timestamp_stream << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << std::endl;
-            }catch(cv::Exception& e){
-                qDebug() << e.what();
-            }
+            m_video_writer << image;
+            auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+            m_timestamp_stream << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << std::endl;
         }
         emit image_changed(m_ip_address.c_str());
 	}	
@@ -84,6 +80,7 @@ cv::Mat Camera::generate_frame(unsigned char* c_ptr, size_t len){
 void Camera::run(){
     std::thread producer([&]{
         std::string url = "http://" + m_ip_address + "/nphMotionJpeg?Resolution=640x480&Quality=Clarity";
+        curl_easy_setopt(m_curl_handle, CURLOPT_NOSIGNAL, 1); // resolve longjmp error.
         curl_easy_setopt(m_curl_handle, CURLOPT_URL, url.c_str());
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEDATA, this);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEFUNCTION, invoke_frame_producer);

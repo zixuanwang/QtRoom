@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "Camera.h"
+#include "CameraView.h"
 #include "HaarDetector.h"
 #include <memory>
 #include <QDate>
@@ -16,9 +16,6 @@
 #include <unordered_map>
 #include "Utility.h"
 
-#define THUMBNAIL_WIDTH 320
-#define THUMBNAIL_HEIGHT 240
-
 namespace Ui {
 class MainWindow;
 }
@@ -31,9 +28,9 @@ public:
     ~MainWindow();
 public slots:
     void pick_config();
-    void run_haar_detection();
+    void pick_video();
+    void haar_detection(bool);
     void load_config(const std::string& config_path);
-    void image_changed(QString ip_address);
     void status_timer_timeout();
     void start_recording();
     void stop_recording();
@@ -44,20 +41,17 @@ private:
     void init_widgets();
     void init_statusbar();
     void init_timers();
-    cv::Mat process_image(cv::Mat& image);
     Ui::MainWindow *ui;
-    std::unordered_map<std::string, std::shared_ptr<Camera> > m_camera_map;
-    std::unordered_map<std::string, std::shared_ptr<QLabel> > m_label_map;
-    std::shared_ptr<PeopleDetector> m_pdetector;
     std::string m_video_directory;
-
-
     // UI widgets
     std::shared_ptr<QGridLayout> m_gridlayout;
-    std::vector<std::shared_ptr<QLabel> > m_label_vector;
+    std::vector<std::shared_ptr<CameraView> > m_camera_view_vector;
+    std::shared_ptr<CameraView> m_video_view;
     std::shared_ptr<QAction> m_action_load_config;
+    std::shared_ptr<QAction> m_action_load_video;
     std::shared_ptr<QAction> m_action_start_recording;
     std::shared_ptr<QAction> m_action_stop_recording;
+    std::shared_ptr<QAction> m_action_haar_detection;
     std::shared_ptr<QAction> m_action_exit;
     std::shared_ptr<QTimer> m_status_timer;
     std::shared_ptr<QLabel> m_status_label;

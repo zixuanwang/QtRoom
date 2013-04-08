@@ -7,5 +7,7 @@
         <file>document-new-5.png</file>
         <file>media-playback-stop.png</file>
         <file>media-record.png</file>
+        <file>edit-group.png</file>
+        <file>document-open-7.png</file>
     </qresource>
 </RCC>

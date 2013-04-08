@@ -52,3 +52,20 @@ void Utility::normalize_image(cv::Mat& image, cv::Mat& output){
     cv::minMaxLoc(image, &min_value, &max_value);
     image.convertTo(output, CV_32FC1, 1.0 / max_value);
 }
+
+void Utility::get_files(std::vector<std::string>& file_vector,
+        const std::string& directory, bool recursive, const std::string& extension) {
+    if (!boost::filesystem::exists(directory)) {
+        return;
+    }
+    boost::filesystem::directory_iterator end_itr;
+    for (boost::filesystem::directory_iterator itr(directory); itr != end_itr;
+            ++itr) {
+        if (recursive && boost::filesystem::is_directory(itr->status())) {
+            get_files(file_vector, itr->path().string(), recursive);
+        } else {
+            if(extension.empty() || (!extension.empty() && itr->path().extension().string() == extension))
+                file_vector.push_back(itr->path().string());
+        }
+    }
+}

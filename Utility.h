@@ -2,6 +2,7 @@
 #define UTILITY_H
 
 #include <algorithm>
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -17,6 +18,7 @@ public:
     static void l1_normalize(std::vector<float>& v);
     static void l2_normalize(std::vector<float>& v);
     static void normalize_image(cv::Mat& image, cv::Mat& output);
+    static void get_files(std::vector<std::string>& file_vector, const std::string& directory, bool recursive = false, const std::string& extension = "");
 };
 
 #endif // UTILITY_H
