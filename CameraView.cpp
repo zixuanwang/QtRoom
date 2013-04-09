@@ -23,13 +23,16 @@ CameraView::~CameraView(){
 }
 
 void CameraView::init(){
-    m_haar = false;
+    m_pick_index = -1;
 }
 
-void CameraView::set_haar_detection(bool run){
-    m_haar = run;
-    if(m_haar && !m_people_detector.get())
-        m_people_detector = std::shared_ptr<PeopleDetector>(new HaarDetector("/usr/local/share/OpenCV/haarcascades/haarcascade_upperbody.xml"));
+void CameraView::set_mode(MODE mode){
+    m_mode = mode;
+    if(m_mode == HAAR){
+        if(!m_people_detector.get()){
+            m_people_detector = std::shared_ptr<PeopleDetector>(new HaarDetector(HAAR_UPPER_BODY_PATH));
+        }
+    }
 }
 
 void CameraView::start_recording(const std::string& video_directory){
@@ -43,10 +46,19 @@ void CameraView::stop_recording(){
 cv::Mat CameraView::process_image(cv::Mat& image){
     if(image.empty())
         return cv::Mat();
-    if(m_haar){
+    if(m_mode == HAAR){
         std::vector<cv::Rect> rect_vector;
         m_people_detector->detect(image, rect_vector);
         m_people_detector->draw(image, rect_vector);
+    }
+    if(m_mode == BACKGROUND){
+        m_color_descriptor.update_background(image);
+        m_color_descriptor.get_background(image);
+    }
+    if(m_mode == OPTICAL_FLOW){
+        cv::Mat flow;
+        m_motion_descriptor.compute(image, flow);
+        m_motion_descriptor.draw_optical_flow(flow, image, 16);
     }
     cv::Mat preview_image;
     cv::resize(image, preview_image, cv::Size(width(), height()));
@@ -61,23 +73,41 @@ void CameraView::paintEvent(QPaintEvent*){
     }
     cv::Mat image = process_image(m_image_buffer);
     painter.drawImage(0, 0, Utility::mat2QImage(image));
-    painter.drawRect(m_point_topleft.x(), m_point_topleft.y(), m_rect_length, m_rect_length);
+    if(m_type == VIDEO && m_pick_index == -1)
+        painter.drawRect(m_point_topleft.x(), m_point_topleft.y(), m_rect_length, m_rect_length);
     m_annotate.draw(&painter);
 }
 
 void CameraView::mousePressEvent(QMouseEvent* event){
-    m_point_start = event->pos();
+    if(m_type == VIDEO){
+        m_pick_index = m_annotate.get_bound_rect(event->pos().x(), event->pos().y());
+        if(m_pick_index != -1){
+            cv::Rect rect = m_annotate.get_rect(m_pick_index);
+            m_point_topleft = QPoint(rect.x, rect.y);
+        }
+        m_point_start = event->pos();
+    }
+
     //qDebug() << event->pos().x() << "\t" << event->pos().y();
 }
 void CameraView::mouseReleaseEvent(QMouseEvent*){
-    m_annotate.add_rect(m_point_topleft.x(), m_point_topleft.y(), m_rect_length, m_rect_length);
+    if(m_type == VIDEO){
+        if(m_pick_index == -1)
+            m_annotate.add_rect(m_point_topleft.x(), m_point_topleft.y(), m_rect_length, m_rect_length);
+    }
     repaint();
 }
 void CameraView::mouseMoveEvent(QMouseEvent *event){
-    m_rect_length = std::max(abs(event->pos().x() - m_point_start.x()), abs(event->pos().y() - m_point_start.y()));
-    int x = event->pos().x() > m_point_start.x() ? m_point_start.x() : m_point_start.x() - m_rect_length;
-    int y = event->pos().y() > m_point_start.y() ? m_point_start.y() : m_point_start.y() - m_rect_length;
-    m_point_topleft = QPoint(x, y);
+    if(m_type == VIDEO){
+        if(m_pick_index != -1){
+            m_annotate.move_rect(m_pick_index, event->pos().x() - m_point_start.x() + m_point_topleft.x(), event->pos().y() - m_point_start.y() + m_point_topleft.y());
+        }else{
+            m_rect_length = std::max(abs(event->pos().x() - m_point_start.x()), abs(event->pos().y() - m_point_start.y()));
+            int x = event->pos().x() > m_point_start.x() ? m_point_start.x() : m_point_start.x() - m_rect_length;
+            int y = event->pos().y() > m_point_start.y() ? m_point_start.y() : m_point_start.y() - m_rect_length;
+            m_point_topleft = QPoint(x, y);
+        }
+    }
     repaint();
 }
 void CameraView::keyPressEvent(QKeyEvent *event){
@@ -88,19 +118,17 @@ void CameraView::keyPressEvent(QKeyEvent *event){
         m_annotate.clear();
     }
     if(event->key() == Qt::Key_S){
-
+        // save image and bounding box
+        m_annotate.set_image(m_image_buffer);
+        m_annotate.save(ANNOTATE_PATH);
+    }
+    if(event->key() == Qt::Key_D){
+        if(m_pick_index != -1)
+            m_annotate.delete_rect(m_pick_index);
     }
     repaint();
 }
 
 void CameraView::image_changed(){
     repaint();
-}
-
-void CameraView::haar_detection(bool run){
-    if(run){
-        m_people_detector = std::shared_ptr<PeopleDetector>(new HaarDetector("/usr/local/share/OpenCV/haarcascades/haarcascade_upperbody.xml"));
-    }else{
-        m_people_detector.reset();
-    }
 }

@@ -9,5 +9,8 @@
         <file>media-record.png</file>
         <file>edit-group.png</file>
         <file>document-open-7.png</file>
+        <file>draw-freehand.png</file>
+        <file>tab-detach.png</file>
+        <file>tools-wizard-3.png</file>
     </qresource>
 </RCC>

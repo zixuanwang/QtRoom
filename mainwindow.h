@@ -30,6 +30,9 @@ public slots:
     void pick_config();
     void pick_video();
     void haar_detection(bool);
+    void background_subtraction(bool);
+    void edge_detection(bool);
+    void optical_flow(bool);
     void load_config(const std::string& config_path);
     void status_timer_timeout();
     void start_recording();
@@ -52,6 +55,9 @@ private:
     std::shared_ptr<QAction> m_action_start_recording;
     std::shared_ptr<QAction> m_action_stop_recording;
     std::shared_ptr<QAction> m_action_haar_detection;
+    std::shared_ptr<QAction> m_action_background_subtraction;
+    std::shared_ptr<QAction> m_action_edge_detection;
+    std::shared_ptr<QAction> m_action_optical_flow;
     std::shared_ptr<QAction> m_action_exit;
     std::shared_ptr<QTimer> m_status_timer;
     std::shared_ptr<QLabel> m_status_label;

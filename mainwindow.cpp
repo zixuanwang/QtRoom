@@ -24,6 +24,9 @@ void MainWindow::init_actions(){
     QPixmap new_pix(":/new/my_resources/document-new-5.png");
     QPixmap open_pix(":/new/my_resources/document-open-7.png");
     QPixmap group_pix(":/new/my_resources/edit-group.png");
+    QPixmap background_pix(":/new/my_resources/tab-detach.png");
+    QPixmap edge_pix(":/new/my_resources/draw-freehand.png");
+    QPixmap optical_flow_pix(":/new/my_resources/tools-wizard-3.png");
     m_action_load_config = std::shared_ptr<QAction>(new QAction(QIcon(new_pix), "Load Config", this));
     m_action_load_config->setShortcut(tr("Ctrl+N"));
     connect(m_action_load_config.get(), SIGNAL(triggered()), this, SLOT(pick_config()));
@@ -42,7 +45,20 @@ void MainWindow::init_actions(){
     connect(m_action_exit.get(), SIGNAL(triggered()), this, SLOT(close()));
     m_action_haar_detection = std::shared_ptr<QAction>(new QAction(QIcon(group_pix), "Haar Detection", this));
     m_action_haar_detection->setCheckable(true);
+    m_action_haar_detection->setDisabled(true);
     connect(m_action_haar_detection.get(), SIGNAL(toggled(bool)), this, SLOT(haar_detection(bool)));
+    m_action_background_subtraction = std::shared_ptr<QAction>(new QAction(QIcon(background_pix), "Background Subtraction", this));
+    m_action_background_subtraction->setCheckable(true);
+    m_action_background_subtraction->setDisabled(true);
+    connect(m_action_background_subtraction.get(), SIGNAL(toggled(bool)), this, SLOT(background_subtraction(bool)));
+    m_action_edge_detection = std::shared_ptr<QAction>(new QAction(QIcon(edge_pix), "Gradient", this));
+    m_action_edge_detection->setCheckable(true);
+    m_action_edge_detection->setDisabled(true);
+    connect(m_action_edge_detection.get(), SIGNAL(toggled(bool)), this, SLOT(edge_detection(bool)));
+    m_action_optical_flow = std::shared_ptr<QAction>(new QAction(QIcon(optical_flow_pix), "Optical Flow", this));
+    m_action_optical_flow->setCheckable(true);
+    m_action_optical_flow->setDisabled(true);
+    connect(m_action_optical_flow.get(), SIGNAL(toggled(bool)), this, SLOT(optical_flow(bool)));
 }
 
 void MainWindow::init_menubar(){
@@ -53,6 +69,9 @@ void MainWindow::init_menubar(){
     fileMenu->addAction(m_action_exit.get());
     QMenu* detectMenu = menuBar()->addMenu(tr("&Detect"));
     detectMenu->addAction(m_action_haar_detection.get());
+    detectMenu->addAction(m_action_background_subtraction.get());
+    detectMenu->addAction(m_action_edge_detection.get());
+    detectMenu->addAction(m_action_optical_flow.get());
 }
 
 void MainWindow::init_toolbar(){
@@ -63,6 +82,9 @@ void MainWindow::init_toolbar(){
     toolbar->addAction(m_action_start_recording.get());
     toolbar->addAction(m_action_stop_recording.get());
     toolbar->addAction(m_action_haar_detection.get());
+    toolbar->addAction(m_action_background_subtraction.get());
+    toolbar->addAction(m_action_edge_detection.get());
+    toolbar->addAction(m_action_optical_flow.get());
 }
 
 void MainWindow::init_widgets(){
@@ -112,7 +134,25 @@ void MainWindow::pick_video(){
 
 void MainWindow::haar_detection(bool run){
     for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
-        m_camera_view_vector[i]->set_haar_detection(run);
+        m_camera_view_vector[i]->set_mode(run ? CameraView::HAAR : CameraView::NORMAL);
+    }
+}
+
+void MainWindow::background_subtraction(bool run){
+    for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
+        m_camera_view_vector[i]->set_mode(run ? CameraView::BACKGROUND : CameraView::NORMAL);
+    }
+}
+
+void MainWindow::edge_detection(bool run){
+    for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
+        m_camera_view_vector[i]->set_mode(run ? CameraView::EDGE : CameraView::NORMAL);
+    }
+}
+
+void MainWindow::optical_flow(bool run){
+    for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
+        m_camera_view_vector[i]->set_mode(run ? CameraView::OPTICAL_FLOW : CameraView::NORMAL);
     }
 }
 
@@ -133,6 +173,10 @@ void MainWindow::load_config(const std::string& config_path){
         in_stream.close();
     }
     m_action_start_recording->setDisabled(false);
+    m_action_haar_detection->setDisabled(false);
+    m_action_background_subtraction->setDisabled(false);
+    m_action_edge_detection->setDisabled(false);
+    m_action_optical_flow->setDisabled(false);
 }
 
 void MainWindow::status_timer_timeout(){

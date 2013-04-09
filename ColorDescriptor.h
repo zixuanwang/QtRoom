@@ -14,7 +14,7 @@ public:
 	ColorDescriptor(int channel_num_bins = 8);
 	virtual ~ColorDescriptor();
 	void compute(cv::Mat& image, cv::Mat& mask);
-	void update_background(cv::Mat& image, cv::Mat& mask);
+    void update_background(const cv::Mat& image, cv::Mat mask = cv::Mat());
 	void get_background(cv::Mat& background){m_bg_model.getBackgroundImage(background);}
 private:
 	int m_channel_num_bins;
