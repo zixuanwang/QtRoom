@@ -59,6 +59,8 @@ void MainWindow::init_actions(){
     m_action_optical_flow->setCheckable(true);
     m_action_optical_flow->setDisabled(true);
     connect(m_action_optical_flow.get(), SIGNAL(toggled(bool)), this, SLOT(optical_flow(bool)));
+    m_action_train_hog = std::shared_ptr<QAction>(new QAction("Train HoG", this));
+
 }
 
 void MainWindow::init_menubar(){
@@ -72,6 +74,8 @@ void MainWindow::init_menubar(){
     detectMenu->addAction(m_action_background_subtraction.get());
     detectMenu->addAction(m_action_edge_detection.get());
     detectMenu->addAction(m_action_optical_flow.get());
+    QMenu* trainMenu = menuBar()->addMenu(tr("&Train"));
+    trainMenu->addAction(m_action_train_hog.get());
 }
 
 void MainWindow::init_toolbar(){
@@ -205,4 +209,8 @@ void MainWindow::stop_recording(){
     }
     m_action_start_recording->setDisabled(false);
     m_action_stop_recording->setDisabled(true);
+}
+
+void MainWindow::train_hog(){
+
 }

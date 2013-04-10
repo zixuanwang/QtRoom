@@ -37,6 +37,7 @@ public slots:
     void status_timer_timeout();
     void start_recording();
     void stop_recording();
+    void train_hog();
 private:
     void init_actions();
     void init_menubar();
@@ -58,6 +59,7 @@ private:
     std::shared_ptr<QAction> m_action_background_subtraction;
     std::shared_ptr<QAction> m_action_edge_detection;
     std::shared_ptr<QAction> m_action_optical_flow;
+    std::shared_ptr<QAction> m_action_train_hog;
     std::shared_ptr<QAction> m_action_exit;
     std::shared_ptr<QTimer> m_status_timer;
     std::shared_ptr<QLabel> m_status_label;
