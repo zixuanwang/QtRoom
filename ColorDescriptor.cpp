@@ -34,6 +34,6 @@ void ColorDescriptor::compute(cv::Mat& image, cv::Mat& mask){
 	Utility::l2_normalize(m_data);
 }
 
-void ColorDescriptor::update_background(const cv::Mat& image, cv::Mat mask){
+void ColorDescriptor::update_background(const cv::Mat& image, cv::Mat& mask){
 	m_bg_model(image, mask);
 }

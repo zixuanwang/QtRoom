@@ -12,7 +12,7 @@ void SVMClassifier::build() {
         m_mat = m_mat.reshape(0, static_cast<int>(m_label_vector.size()));
     }
     m_params.svm_type = CvSVM::C_SVC;
-    m_params.kernel_type = CvSVM::LINEAR;
+    m_params.kernel_type = CvSVM::RBF;
     m_params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
     std::vector<float> label_vector(m_label_vector.begin(), m_label_vector.end());
     cv::Mat label_mat(label_vector);
@@ -26,9 +26,9 @@ float SVMClassifier::query(const std::vector<float>& sample) {
 }
 
 void SVMClassifier::save(const std::string& filepath) {
-    Classifier::save(filepath);
+    m_SVM.save(filepath.c_str());
 }
 
 void SVMClassifier::load(const std::string& filepath) {
-    Classifier::load(filepath);
+    m_SVM.load(filepath.c_str());
 }

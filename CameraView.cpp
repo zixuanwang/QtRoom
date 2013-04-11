@@ -10,11 +10,17 @@ CameraView::CameraView(const std::string& ip_address, const std::string& usernam
     m_camera->start();
 }
 
-CameraView::CameraView(const std::string& video_path){
+CameraView::CameraView(const std::string& video_path, Type type){
     m_video_capture.open(video_path);
-    m_type = VIDEO;
-    setFixedWidth(FULL_WIDTH);
-    setFixedHeight(FULL_HEIGHT);
+    m_type = type;
+    if(m_type == ANNOTATE){
+        setFixedWidth(FULL_WIDTH);
+        setFixedHeight(FULL_HEIGHT);
+    }
+    if(m_type == VIDEO){
+        setFixedWidth(THUMBNAIL_WIDTH);
+        setFixedHeight(THUMBNAIL_HEIGHT);
+    }
     init();
 }
 
@@ -23,14 +29,19 @@ CameraView::~CameraView(){
 }
 
 void CameraView::init(){
-    m_pick_index = -1;
+    m_pick_rect_index = -1;
 }
 
 void CameraView::set_mode(MODE mode){
     m_mode = mode;
-    if(m_mode == HAAR){
+    if(m_mode == CASCADE){
         if(!m_people_detector.get()){
-            m_people_detector = std::shared_ptr<PeopleDetector>(new HaarDetector(HAAR_UPPER_BODY_PATH));
+            m_people_detector = std::shared_ptr<PeopleDetector>(new CascadeDetector(LBP_UPPER_BODY_PATH));
+        }
+    }
+    if(m_mode == WALNUT){
+        if(!m_people_detector.get()){
+            m_people_detector = std::shared_ptr<PeopleDetector>(new WalnutDetector);
         }
     }
 }
@@ -46,18 +57,21 @@ void CameraView::stop_recording(){
 cv::Mat CameraView::process_image(cv::Mat& image){
     if(image.empty())
         return cv::Mat();
-    if(m_mode == HAAR){
+    if(m_mode == CASCADE || m_mode == WALNUT){
         std::vector<cv::Rect> rect_vector;
         m_people_detector->detect(image, rect_vector);
         m_people_detector->draw(image, rect_vector);
     }
     if(m_mode == BACKGROUND){
-        m_color_descriptor.update_background(image);
-        m_color_descriptor.get_background(image);
+        cv::Mat foreground;
+        m_color_descriptor.update_background(image, foreground);
+        if(!foreground.empty())
+            cv::cvtColor(foreground, image, CV_GRAY2BGR);
+        //m_color_descriptor.get_background(image);
     }
     if(m_mode == OPTICAL_FLOW){
-        cv::Mat flow;
-        m_motion_descriptor.compute(image, flow);
+        m_motion_descriptor.compute(image);
+        cv::Mat flow = m_motion_descriptor.get_flow();
         m_motion_descriptor.draw_optical_flow(flow, image, 16);
     }
     cv::Mat preview_image;
@@ -73,34 +87,33 @@ void CameraView::paintEvent(QPaintEvent*){
     }
     cv::Mat image = process_image(m_image_buffer);
     painter.drawImage(0, 0, Utility::mat2QImage(image));
-    if(m_type == VIDEO && m_pick_index == -1)
+    if(m_type == ANNOTATE && m_pick_rect_index == -1)
         painter.drawRect(m_point_topleft.x(), m_point_topleft.y(), m_rect_length, m_rect_length);
     m_annotate.draw(&painter);
 }
 
 void CameraView::mousePressEvent(QMouseEvent* event){
-    if(m_type == VIDEO){
-        m_pick_index = m_annotate.get_bound_rect(event->pos().x(), event->pos().y());
-        if(m_pick_index != -1){
-            cv::Rect rect = m_annotate.get_rect(m_pick_index);
+    if(m_type == ANNOTATE){
+        m_pick_rect_index = m_annotate.get_bound_rect(event->pos().x(), event->pos().y());
+        if(m_pick_rect_index != -1){
+            cv::Rect rect = m_annotate.get_rect(m_pick_rect_index);
             m_point_topleft = QPoint(rect.x, rect.y);
         }
         m_point_start = event->pos();
     }
-
     //qDebug() << event->pos().x() << "\t" << event->pos().y();
 }
 void CameraView::mouseReleaseEvent(QMouseEvent*){
-    if(m_type == VIDEO){
-        if(m_pick_index == -1)
+    if(m_type == ANNOTATE){
+        if(m_pick_rect_index == -1)
             m_annotate.add_rect(m_point_topleft.x(), m_point_topleft.y(), m_rect_length, m_rect_length);
     }
     repaint();
 }
 void CameraView::mouseMoveEvent(QMouseEvent *event){
-    if(m_type == VIDEO){
-        if(m_pick_index != -1){
-            m_annotate.move_rect(m_pick_index, event->pos().x() - m_point_start.x() + m_point_topleft.x(), event->pos().y() - m_point_start.y() + m_point_topleft.y());
+    if(m_type == ANNOTATE){
+        if(m_pick_rect_index != -1){
+            m_annotate.move_rect(m_pick_rect_index, event->pos().x() - m_point_start.x() + m_point_topleft.x(), event->pos().y() - m_point_start.y() + m_point_topleft.y());
         }else{
             m_rect_length = std::max(abs(event->pos().x() - m_point_start.x()), abs(event->pos().y() - m_point_start.y()));
             int x = event->pos().x() > m_point_start.x() ? m_point_start.x() : m_point_start.x() - m_rect_length;
@@ -123,12 +136,19 @@ void CameraView::keyPressEvent(QKeyEvent *event){
         m_annotate.save(ANNOTATE_PATH);
     }
     if(event->key() == Qt::Key_D){
-        if(m_pick_index != -1)
-            m_annotate.delete_rect(m_pick_index);
+        if(m_pick_rect_index != -1)
+            m_annotate.delete_rect(m_pick_rect_index);
     }
     repaint();
 }
 
 void CameraView::image_changed(){
     repaint();
+}
+
+void CameraView::read_image(){
+    if(m_video_capture.isOpened()){
+        m_video_capture >> m_image_buffer;
+        repaint();
+    }
 }

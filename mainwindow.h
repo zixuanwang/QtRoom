@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include "CameraView.h"
-#include "HaarDetector.h"
+#include "HoGDescriptor.h"
 #include <memory>
 #include <QDate>
 #include <QFileDialog>
@@ -13,6 +13,8 @@
 #include <QTime>
 #include <QTimer>
 #include <QToolBar>
+#include "SVMClassifier.h"
+#include "Trainer.h"
 #include <unordered_map>
 #include "Utility.h"
 
@@ -28,13 +30,16 @@ public:
     ~MainWindow();
 public slots:
     void pick_config();
+    void load_video();
     void pick_video();
-    void haar_detection(bool);
+    void cascade_detection(bool);
     void background_subtraction(bool);
     void edge_detection(bool);
     void optical_flow(bool);
+    void walnut_detection(bool);
     void load_config(const std::string& config_path);
     void status_timer_timeout();
+    void video_timer_timeout();
     void start_recording();
     void stop_recording();
     void train_hog();
@@ -44,7 +49,7 @@ private:
     void init_toolbar();
     void init_widgets();
     void init_statusbar();
-    void init_timers();
+    void enable_buttons();
     Ui::MainWindow *ui;
     std::string m_video_directory;
     // UI widgets
@@ -53,16 +58,19 @@ private:
     std::shared_ptr<CameraView> m_video_view;
     std::shared_ptr<QAction> m_action_load_config;
     std::shared_ptr<QAction> m_action_load_video;
+    std::shared_ptr<QAction> m_action_annotate_video;
     std::shared_ptr<QAction> m_action_start_recording;
     std::shared_ptr<QAction> m_action_stop_recording;
-    std::shared_ptr<QAction> m_action_haar_detection;
+    std::shared_ptr<QAction> m_action_cascade_detection;
     std::shared_ptr<QAction> m_action_background_subtraction;
     std::shared_ptr<QAction> m_action_edge_detection;
     std::shared_ptr<QAction> m_action_optical_flow;
     std::shared_ptr<QAction> m_action_train_hog;
+    std::shared_ptr<QAction> m_action_walnut_detection;
     std::shared_ptr<QAction> m_action_exit;
     std::shared_ptr<QTimer> m_status_timer;
     std::shared_ptr<QLabel> m_status_label;
+    std::shared_ptr<QTimer> m_video_timer;
 };
 
 #endif // MAINWINDOW_H

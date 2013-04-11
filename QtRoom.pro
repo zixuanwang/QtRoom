@@ -17,7 +17,6 @@ SOURCES += main.cpp\
     Camera.cpp \
     Utility.cpp \
     PeopleDetector.cpp \
-    HaarDetector.cpp \
     CameraView.cpp \
     Annotate.cpp \
     MotionDescriptor.cpp \
@@ -26,13 +25,15 @@ SOURCES += main.cpp\
     ColorDescriptor.cpp \
     Classifier.cpp \
     Serializer.cpp \
-    SVMClassifier.cpp
+    SVMClassifier.cpp \
+    Trainer.cpp \
+    WalnutDetector.cpp \
+    CascadeDetector.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
     Utility.h \
     PeopleDetector.h \
-    HaarDetector.h \
     CameraView.h \
     Annotate.h \
     MotionDescriptor.h \
@@ -41,7 +42,10 @@ HEADERS  += mainwindow.h \
     ColorDescriptor.h \
     Classifier.h \
     Serializer.h \
-    SVMClassifier.h
+    SVMClassifier.h \
+    Trainer.h \
+    WalnutDetector.h \
+    CascadeDetector.h
 
 FORMS    += mainwindow.ui
 

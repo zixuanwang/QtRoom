@@ -1,4 +1,4 @@
-#include "Utility.h"
+﻿#include "Utility.h"
 
 Utility::Utility()
 {
@@ -46,7 +46,7 @@ void Utility::l2_normalize(std::vector<float>& v){
     }
 }
 
-void Utility::normalize_image(cv::Mat& image, cv::Mat& output){
+void Utility::normalize_image(const cv::Mat& image, cv::Mat& output){
     double min_value;
     double max_value;
     cv::minMaxLoc(image, &min_value, &max_value);
@@ -68,4 +68,39 @@ void Utility::get_files(std::vector<std::string>& file_vector,
                 file_vector.push_back(itr->path().string());
         }
     }
+}
+
+std::string Utility::get_parent_path(const std::string& filepath){
+    boost::filesystem::path bst_filepath = filepath;
+    return bst_filepath.parent_path().string();
+}
+
+std::string Utility::get_parent_name(const std::string& filepath){
+    boost::filesystem::path bst_filepath = filepath;
+    return bst_filepath.filename().string();
+}
+
+std::string Utility::get_stem(const std::string& filepath){
+    boost::filesystem::path bst_filepath = filepath;
+    return bst_filepath.stem().string();
+}
+
+std::string Utility::get_extension(const std::string& filepath){
+    boost::filesystem::path bst_filepath = filepath;
+    return bst_filepath.extension().string();
+}
+
+std::string Utility::get_stem_path(const std::string& filepath){
+    boost::filesystem::path bst_filepath = filepath;
+    return (bst_filepath.parent_path() / bst_filepath.stem()).string();
+}
+
+std::string Utility::get_name(const std::string& filepath){
+    boost::filesystem::path bst_filepath = filepath;
+    return bst_filepath.filename().string();
+}
+
+int64_t Utility::get_timestamp(){
+    auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 }

@@ -99,11 +99,8 @@ void Camera::fetch_frame(cv::Mat& image){
 }
 
 void Camera::start_recording(const std::string& output_dir){
-    auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
-    std::stringstream ss;
-    ss << output_dir << "/" << m_ip_address << "." << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    std::string video_path = ss.str() + ".avi";
-    std::string timestamp_path = ss.str() + ".timestamp";
+    std::string video_path = output_dir + "/" + m_ip_address + ".avi";
+    std::string timestamp_path = output_dir + "/" + m_ip_address + ".timestamp";
     s_av_mutex.lock(); // make libav happy in multithreading.
     m_video_writer.open(video_path, CV_FOURCC('M','P','4','2'), 30, cv::Size(640, 480)); // output video format.
     s_av_mutex.unlock();
