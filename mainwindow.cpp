@@ -68,6 +68,8 @@ void MainWindow::init_actions(){
     m_action_walnut_detection->setCheckable(true);
     m_action_walnut_detection->setDisabled(true);
     connect(m_action_walnut_detection.get(), SIGNAL(toggled(bool)), this, SLOT(walnut_detection(bool)));
+    m_action_about = std::shared_ptr<QAction>(new QAction(tr("&About"), this));
+    connect(m_action_about.get(), SIGNAL(triggered()), this, SLOT(about()));
 }
 
 void MainWindow::init_menubar(){
@@ -86,6 +88,8 @@ void MainWindow::init_menubar(){
     detectMenu->addAction(m_action_walnut_detection.get());
     QMenu* trainMenu = menuBar()->addMenu(tr("&Train"));
     trainMenu->addAction(m_action_train_hog.get());
+    QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(m_action_about.get());
 }
 
 void MainWindow::init_toolbar(){
@@ -256,4 +260,8 @@ void MainWindow::train_hog(){
     if(result){
         Trainer::train_hog(dialog.selectedFiles()[0].toStdString());
     }
+}
+
+void MainWindow::about(){
+    QMessageBox::about(this, "About iRoom", "Version 0.01");
 }
