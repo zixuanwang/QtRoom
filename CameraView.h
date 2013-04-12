@@ -36,6 +36,7 @@ public:
     cv::Mat process_image(cv::Mat& image); // the major function to analyse the image.
     virtual ~CameraView();
 protected:
+    bool event(QEvent *);
     void paintEvent(QPaintEvent*);
     void mousePressEvent(QMouseEvent*);
     void mouseReleaseEvent(QMouseEvent*);
@@ -50,6 +51,7 @@ private:
     int m_rect_length;
     Type m_type;
     MODE m_mode;
+    std::string m_id; // ip address of the camera.
     Annotate m_annotate;
     int m_pick_rect_index; // the index of the picked rect.
     std::shared_ptr<PeopleDetector> m_people_detector;

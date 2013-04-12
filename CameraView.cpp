@@ -4,6 +4,7 @@ CameraView::CameraView(const std::string& ip_address, const std::string& usernam
     m_camera = std::shared_ptr<Camera>(new Camera(ip_address, username, password));
     connect(m_camera.get(), SIGNAL(image_changed(QString)), this, SLOT(image_changed()));
     m_type = CAMERA;
+    m_id = ip_address;
     setFixedWidth(THUMBNAIL_WIDTH);
     setFixedHeight(THUMBNAIL_HEIGHT);
     init();
@@ -13,6 +14,7 @@ CameraView::CameraView(const std::string& ip_address, const std::string& usernam
 CameraView::CameraView(const std::string& video_path, Type type){
     m_video_capture.open(video_path);
     m_type = type;
+    m_id = Utility::get_stem(video_path);
     if(m_type == ANNOTATE){
         setFixedWidth(FULL_WIDTH);
         setFixedHeight(FULL_HEIGHT);
@@ -77,6 +79,15 @@ cv::Mat CameraView::process_image(cv::Mat& image){
     cv::Mat preview_image;
     cv::resize(image, preview_image, cv::Size(width(), height()));
     return preview_image;
+}
+
+bool CameraView::event(QEvent* event){
+    if(event->type() == QEvent::ToolTip){
+        QHelpEvent* help_event = static_cast<QHelpEvent*>(event);
+        QToolTip::showText(help_event->globalPos(), m_id.c_str());
+        return true;
+    }
+    return QWidget::event(event);
 }
 
 void CameraView::paintEvent(QPaintEvent*){
