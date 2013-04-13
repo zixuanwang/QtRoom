@@ -33,10 +33,10 @@ void MotionDescriptor::compute(const cv::Mat& image){
 		cv::cvtColor(image, gray, CV_BGR2GRAY);
 	}
     if(m_flow_magnitude.empty()){
-        m_flow_magnitude = cv::Mat(gray.size(), CV_32FC1);
+        m_flow_magnitude = cv::Mat(gray.size(), CV_32FC1, cv::Scalar(0));
     }
     if(m_motion_map.empty()){
-        m_motion_map = cv::Mat(gray.size(), CV_32FC1);
+        m_motion_map = cv::Mat(gray.size(), CV_32FC1, cv::Scalar(0));
     }
     if(!m_prev.empty()){
         cv::calcOpticalFlowFarneback(m_prev, gray, m_flow, 0.5, 3, 15, 3, 5, 1.2, 0); // compute optical flow.

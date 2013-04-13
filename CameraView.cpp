@@ -2,7 +2,7 @@
 
 CameraView::CameraView(const std::string& ip_address, const std::string& username, const std::string& password){
     m_camera = std::shared_ptr<Camera>(new Camera(ip_address, username, password));
-    connect(m_camera.get(), SIGNAL(image_changed(QString)), this, SLOT(image_changed()));
+    connect(m_camera.get(), SIGNAL(image_changed()), this, SLOT(image_changed()));
     m_type = CAMERA;
     m_id = ip_address;
     setFixedWidth(THUMBNAIL_WIDTH);
@@ -42,14 +42,16 @@ void CameraView::init(){
 
 void CameraView::set_mode(MODE mode){
     m_mode = mode;
+    std::stringstream ss;
+    ss << ANNOTATE_PATH << "/" << m_id << "/hog_data/cascade.xml";
     if(m_mode == CASCADE){
         if(!m_people_detector.get()){
-            m_people_detector = std::shared_ptr<PeopleDetector>(new CascadeDetector(LBP_UPPER_BODY_PATH));
+            m_people_detector = std::shared_ptr<PeopleDetector>(new CascadeDetector(ss.str()));
         }
     }
     if(m_mode == WALNUT){
         if(!m_people_detector.get()){
-            m_people_detector = std::shared_ptr<PeopleDetector>(new WalnutDetector);
+            m_people_detector = std::shared_ptr<PeopleDetector>(new WalnutDetector(ss.str()));
         }
     }
 }

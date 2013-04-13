@@ -21,7 +21,7 @@ class Camera : public QThread
 {
     Q_OBJECT
 signals:
-    void image_changed(QString ip_address);
+    void image_changed();
 public:
 	// construct the camera by passing the ip address, username and password.
     Camera(const std::string& ip_address, const std::string& username = "", const std::string& password = "");

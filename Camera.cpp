@@ -34,7 +34,7 @@ size_t Camera::frame_producer(void* ptr, size_t size, size_t nmemb){
             auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
             m_timestamp_stream << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << std::endl;
         }
-        emit image_changed(m_ip_address.c_str());
+        emit image_changed();
 	}	
 	return len;
 }

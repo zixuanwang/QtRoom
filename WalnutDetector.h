@@ -10,13 +10,11 @@
 #include "Utility.h"
 
 #define HAAR_UPPER_BODY_PATH "/usr/local/share/OpenCV/haarcascades/haarcascade_upperbody.xml"
-#define LBP_UPPER_BODY_PATH "/home/zxwang/Dropbox/data/iroom/annotate/171.67.83.73/lbp_data/cascade.xml"
-#define HOG_UPPER_BODY_PATH "/home/zxwang/Dropbox/data/iroom/annotate/171.67.83.73/hog_data/cascade.xml"
 
 class WalnutDetector : public PeopleDetector
 {
 public:
-    WalnutDetector();
+    WalnutDetector(const std::string& cascade_path);
     ~WalnutDetector();
     void detect(const cv::Mat& image, std::vector<cv::Rect>& bbox);
     cv::Mat debug(const cv::Mat& image);

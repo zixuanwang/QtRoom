@@ -199,7 +199,9 @@ void MainWindow::optical_flow(bool run){
 }
 
 void MainWindow::walnut_detection(bool run){
-    m_camera_view_vector[5]->set_mode(run ? CameraView::WALNUT : CameraView::NORMAL);
+    for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
+        m_camera_view_vector[i]->set_mode(run ? CameraView::WALNUT : CameraView::NORMAL);
+    }
 }
 
 void MainWindow::load_config(const std::string& config_path){

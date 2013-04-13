@@ -1,6 +1,6 @@
 #include "WalnutDetector.h"
 
-WalnutDetector::WalnutDetector() : m_cascade_detector(HOG_UPPER_BODY_PATH){
+WalnutDetector::WalnutDetector(const std::string& cascade_path) : m_cascade_detector(cascade_path){
 }
 
 WalnutDetector::~WalnutDetector(){
