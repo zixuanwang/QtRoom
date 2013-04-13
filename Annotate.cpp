@@ -1,6 +1,6 @@
 #include "Annotate.h"
 
-Annotate::Annotate() : m_index(0){
+Annotate::Annotate() {
 }
 
 void Annotate::add_rect(const cv::Rect& rect){
@@ -50,7 +50,7 @@ std::ostream& operator<<(std::ostream& os, const Annotate& annotate){
 void Annotate::save(const std::string& output_dir){
     if(!boost::filesystem::exists(output_dir))
         boost::filesystem::create_directories(output_dir);
-    std::string prefix = output_dir + "/" + boost::lexical_cast<std::string>(m_index++);
+    std::string prefix = output_dir + "/" + m_timestamp;
     cv::imwrite(prefix + ".jpg", m_image);
     std::ofstream out_stream(prefix + ".txt");
     out_stream << (*this);

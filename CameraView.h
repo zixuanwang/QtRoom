@@ -9,6 +9,7 @@
 #include "MotionDescriptor.h"
 #include <QMouseEvent>
 #include <QtGui>
+#include <QToolTip>
 #include <QWidget>
 #include "Utility.h"
 #include "WalnutDetector.h"
@@ -45,6 +46,8 @@ protected:
 private:
     std::shared_ptr<Camera> m_camera;
     cv::VideoCapture m_video_capture;
+    std::ifstream m_timestamp_stream;
+    std::string m_timestamp; // the timestamp of the current frame.
     cv::Mat m_image_buffer;
     QPoint m_point_start;
     QPoint m_point_topleft;

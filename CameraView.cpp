@@ -13,6 +13,7 @@ CameraView::CameraView(const std::string& ip_address, const std::string& usernam
 
 CameraView::CameraView(const std::string& video_path, Type type){
     m_video_capture.open(video_path);
+    m_timestamp_stream.open(Utility::get_stem_path(video_path) + ".timestamp");
     m_type = type;
     m_id = Utility::get_stem(video_path);
     if(m_type == ANNOTATE){
@@ -27,7 +28,12 @@ CameraView::CameraView(const std::string& video_path, Type type){
 }
 
 CameraView::~CameraView(){
-
+    if(m_video_capture.isOpened()){
+        m_video_capture.release();
+    }
+    if(m_timestamp_stream.is_open()){
+        m_timestamp_stream.close();
+    }
 }
 
 void CameraView::init(){
@@ -137,14 +143,17 @@ void CameraView::mouseMoveEvent(QMouseEvent *event){
 void CameraView::keyPressEvent(QKeyEvent *event){
     if(event->key() == Qt::Key_P){
         m_video_capture >> m_image_buffer;
+        getline(m_timestamp_stream, m_timestamp);
     }
     if(event->key() == Qt::Key_C){
         m_annotate.clear();
     }
     if(event->key() == Qt::Key_S){
         // save image and bounding box
-        m_annotate.set_image(m_image_buffer);
-        m_annotate.save(ANNOTATE_PATH);
+        m_annotate.set_image(m_image_buffer, m_timestamp);
+        std::stringstream ss;
+        ss << ANNOTATE_PATH << "/" << m_id;
+        m_annotate.save(ss.str());
     }
     if(event->key() == Qt::Key_D){
         if(m_pick_rect_index != -1)

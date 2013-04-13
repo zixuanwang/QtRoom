@@ -23,14 +23,14 @@ public:
     cv::Rect get_rect(int index){return m_rect_vector[index];}
     int get_bound_rect(int x, int y); // get the index of the bounding rect. if no bounding rect is found, -1 is returned.
     bool in_rect(const cv::Rect& rect, int x, int y); // check the point whether in the rect.
-    void set_image(const cv::Mat& image){m_image = image;}
+    void set_image(const cv::Mat& image, const std::string& timestamp){m_image = image; m_timestamp = timestamp;}
     void save(const std::string& output_dir);
     // overload the output function.
     friend std::ostream& operator<<(std::ostream& os, const Annotate& annotate);
 private:
-    int m_index;
     std::vector<cv::Rect> m_rect_vector;
     cv::Mat m_image;
+    std::string m_timestamp;
 };
 
 #endif // ANNOTATE_H

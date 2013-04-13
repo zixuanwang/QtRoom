@@ -13,7 +13,7 @@ class Trainer
 public:
     Trainer();
     static void train_hog(const std::string& train_directory);
-    static void train_haar(const std::string& train_directory);
+    static void train_cascade(const std::string& train_directory);
 };
 
 #endif // TRAINER_H

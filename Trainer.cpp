@@ -59,7 +59,8 @@ void Trainer::train_hog(const std::string& train_directory){
     classifier.save(train_directory + "/hog.svm");
 }
 
-void Trainer::train_haar(const std::string& train_directory){
+void Trainer::train_cascade(const std::string& train_directory){
+    // generate info.dat
     std::string positive_directory = train_directory + "/positive";
     std::vector<std::string> positive_image_vector;
     Utility::get_files(positive_image_vector, positive_directory, false, ".jpg");
@@ -84,4 +85,13 @@ void Trainer::train_haar(const std::string& train_directory){
         info_stream << std::endl;
     }
     info_stream.close();
+    // generate bg.txt
+    std::string negative_directory = train_directory + "/negative";
+    std::vector<std::string> negative_image_vector;
+    Utility::get_files(negative_image_vector, negative_directory, false, ".jpg");
+    std::ofstream bg_stream(train_directory + "/bg.txt");
+    for(size_t i = 0; i < negative_image_vector.size(); ++i){
+        bg_stream << "negative/" << Utility::get_name(negative_image_vector[i]) << std::endl;
+    }
+    bg_stream.close();
 }

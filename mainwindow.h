@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QLabel>
 #include <QTime>
 #include <QTimer>
@@ -43,6 +44,7 @@ public slots:
     void start_recording();
     void stop_recording();
     void train_hog();
+    void prepare_cascade();
     void about();
 private:
     void init_actions();
@@ -67,6 +69,7 @@ private:
     std::shared_ptr<QAction> m_action_edge_detection;
     std::shared_ptr<QAction> m_action_optical_flow;
     std::shared_ptr<QAction> m_action_train_hog;
+    std::shared_ptr<QAction> m_action_prepare_cascade;
     std::shared_ptr<QAction> m_action_walnut_detection;
     std::shared_ptr<QAction> m_action_exit;
     std::shared_ptr<QAction> m_action_about;

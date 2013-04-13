@@ -64,11 +64,13 @@ void MainWindow::init_actions(){
     connect(m_action_optical_flow.get(), SIGNAL(toggled(bool)), this, SLOT(optical_flow(bool)));
     m_action_train_hog = std::shared_ptr<QAction>(new QAction("Train HoG", this));
     connect(m_action_train_hog.get(), SIGNAL(triggered()), this, SLOT(train_hog()));
+    m_action_prepare_cascade = std::shared_ptr<QAction>(new QAction("Prepare Cascade", this));
+    connect(m_action_prepare_cascade.get(), SIGNAL(triggered()), this, SLOT(prepare_cascade()));
     m_action_walnut_detection = std::shared_ptr<QAction>(new QAction(QIcon(walnut_pix), "Detection", this));
     m_action_walnut_detection->setCheckable(true);
     m_action_walnut_detection->setDisabled(true);
     connect(m_action_walnut_detection.get(), SIGNAL(toggled(bool)), this, SLOT(walnut_detection(bool)));
-    m_action_about = std::shared_ptr<QAction>(new QAction(tr("&About"), this));
+    m_action_about = std::shared_ptr<QAction>(new QAction("About", this));
     connect(m_action_about.get(), SIGNAL(triggered()), this, SLOT(about()));
 }
 
@@ -88,6 +90,7 @@ void MainWindow::init_menubar(){
     detectMenu->addAction(m_action_walnut_detection.get());
     QMenu* trainMenu = menuBar()->addMenu(tr("&Train"));
     trainMenu->addAction(m_action_train_hog.get());
+    trainMenu->addAction(m_action_prepare_cascade.get());
     QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(m_action_about.get());
 }
@@ -254,11 +257,17 @@ void MainWindow::stop_recording(){
 }
 
 void MainWindow::train_hog(){
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::Directory);
-    int result = dialog.exec();
-    if(result){
-        Trainer::train_hog(dialog.selectedFiles()[0].toStdString());
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), QDir::homePath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(dir.size() != 0){
+        Trainer::train_hog(dir.toStdString());
+    }
+}
+
+void MainWindow::prepare_cascade(){
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), QDir::homePath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(dir.size() != 0){
+        Trainer::train_cascade(dir.toStdString());
+        QMessageBox::information(this, "Preparation Finished", "Please run opencv_createsamples and opencv_traincascade");
     }
 }
 
