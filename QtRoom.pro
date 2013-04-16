@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     SVMClassifier.cpp \
     Trainer.cpp \
     WalnutDetector.cpp \
-    CascadeDetector.cpp
+    CascadeDetector.cpp \
+    GeometryConstraint.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
@@ -45,7 +46,8 @@ HEADERS  += mainwindow.h \
     SVMClassifier.h \
     Trainer.h \
     WalnutDetector.h \
-    CascadeDetector.h
+    CascadeDetector.h \
+    GeometryConstraint.h
 
 FORMS    += mainwindow.ui
 
