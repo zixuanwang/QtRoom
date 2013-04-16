@@ -3,11 +3,6 @@
 
 #include "Annotate.h"
 #include "Camera.h"
-#include "CascadeDetector.h"
-#include "ColorDescriptor.h"
-#include "GeometryConstraint.h"
-#include "HoGDescriptor.h"
-#include "MotionDescriptor.h"
 #include <QMouseEvent>
 #include <QtGui>
 #include <QToolTip>

@@ -12,6 +12,7 @@ public:
     virtual void detect(const cv::Mat& image, std::vector<cv::Rect>& bbox) = 0;
     virtual cv::Mat debug(const cv::Mat& image) = 0;
     void draw(cv::Mat& image, const std::vector<cv::Rect>& bbox);
+    virtual int get_count() = 0;
 };
 
 #endif // PEOPLEDETECTOR_H

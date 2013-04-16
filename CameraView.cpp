@@ -43,14 +43,14 @@ void CameraView::init(){
 void CameraView::set_mode(MODE mode){
     m_mode = mode;
     std::stringstream ss;
-    ss << ANNOTATE_PATH << "/" << m_id << "/hog_data/cascade.xml";
+    ss << ANNOTATE_PATH << "/" << m_id;
     if(m_mode == CASCADE){
-        if(!m_people_detector.get()){
+        if(m_people_detector == nullptr){
             m_people_detector = std::shared_ptr<PeopleDetector>(new CascadeDetector(ss.str()));
         }
     }
     if(m_mode == WALNUT){
-        if(!m_people_detector.get()){
+        if(m_people_detector == nullptr){
             m_people_detector = std::shared_ptr<PeopleDetector>(new WalnutDetector(ss.str()));
         }
     }
@@ -71,6 +71,7 @@ cv::Mat CameraView::process_image(cv::Mat& image){
         std::vector<cv::Rect> rect_vector;
         m_people_detector->detect(image, rect_vector);
         m_people_detector->draw(image, rect_vector);
+        qDebug() << m_id.c_str() << "\t" << m_people_detector->get_count();
     }
     if(m_mode == BACKGROUND){
         cv::Mat foreground;
