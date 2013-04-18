@@ -10,8 +10,6 @@
 
 #include "FeatureDescriptor.h"
 
-#define PI 3.1415926
-
 class HoGDescriptor : public FeatureDescriptor {
 public:
     HoGDescriptor(int num_bins = 9, int row_cell_count = 2, int column_cell_count = 2);

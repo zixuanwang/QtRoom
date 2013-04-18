@@ -3,6 +3,7 @@
 #include <chrono>
 #include <curl/curl.h>
 #include <fstream>
+#include "GlobalConfig.h"
 #include <iostream>
 #include <mutex>
 #include <opencv2/opencv.hpp>
@@ -14,8 +15,6 @@
 #include <string>
 #include <sstream>
 #include <thread>
-
-#define IMAGE_BUFFER_SIZE 50
 
 class Camera : public QThread
 {

@@ -26,9 +26,9 @@ void Trainer::train_hog(const std::string& train_directory){
             cv::Rect rect(boost::lexical_cast<int>(strs[0]), boost::lexical_cast<int>(strs[1]), boost::lexical_cast<int>(strs[2]), boost::lexical_cast<int>(strs[3]));
             cv::Mat sub_image = image(rect);
             cv::Mat patch;
-            cv::resize(sub_image, patch, cv::Size(PATCH_WIDTH, PATCH_HEIGHT));
+            cv::resize(sub_image, patch, cv::Size(GlobalConfig::TRAIN_PATCH_WIDTH, GlobalConfig::TRAIN_PATCH_HEIGHT));
             std::vector<float> sample;
-            hog_descriptor.compute(patch, cv::Rect(0, 0, PATCH_WIDTH, PATCH_HEIGHT), sample);
+            hog_descriptor.compute(patch, cv::Rect(0, 0, GlobalConfig::TRAIN_PATCH_WIDTH, GlobalConfig::TRAIN_PATCH_HEIGHT), sample);
             classifier.add_sample(sample, 1);
             ++positive_sample_count;
         }
@@ -49,9 +49,9 @@ void Trainer::train_hog(const std::string& train_directory){
             cv::Rect rect(rand() % (width - length -1), rand() % (height - length -1), length, length);
             cv::Mat sub_image = image(rect);
             cv::Mat patch;
-            cv::resize(sub_image, patch, cv::Size(PATCH_WIDTH, PATCH_HEIGHT));
+            cv::resize(sub_image, patch, cv::Size(GlobalConfig::TRAIN_PATCH_WIDTH, GlobalConfig::TRAIN_PATCH_HEIGHT));
             std::vector<float> sample;
-            hog_descriptor.compute(patch, cv::Rect(0, 0, PATCH_WIDTH, PATCH_HEIGHT), sample);
+            hog_descriptor.compute(patch, cv::Rect(0, 0, GlobalConfig::TRAIN_PATCH_WIDTH, GlobalConfig::TRAIN_PATCH_HEIGHT), sample);
             classifier.add_sample(sample, -1);
         }
     }

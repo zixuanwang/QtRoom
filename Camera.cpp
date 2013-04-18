@@ -2,7 +2,7 @@
 
 std::mutex Camera::s_av_mutex;
 
-Camera::Camera(const std::string& ip_address, const std::string& username, const std::string& password) : QThread(), m_ip_address(ip_address), m_username(username), m_password(password), m_curl_handle(NULL), m_is_recording(false), m_buffer_queue(IMAGE_BUFFER_SIZE){
+Camera::Camera(const std::string& ip_address, const std::string& username, const std::string& password) : QThread(), m_ip_address(ip_address), m_username(username), m_password(password), m_curl_handle(NULL), m_is_recording(false), m_buffer_queue(GlobalConfig::CAMERA_IMAGE_BUFFER_SIZE){
     std::string userpass = m_username + ":" + m_password;
     m_curl_handle = curl_easy_init();
     curl_easy_setopt(m_curl_handle, CURLOPT_USERPWD, userpass.c_str());

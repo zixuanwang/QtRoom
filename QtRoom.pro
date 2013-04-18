@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     WalnutDetector.cpp \
     CascadeDetector.cpp \
     GeometryConstraint.cpp \
-    PeoplePlot.cpp
+    PeoplePlot.cpp \
+    GlobalConfig.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
@@ -49,7 +50,8 @@ HEADERS  += mainwindow.h \
     WalnutDetector.h \
     CascadeDetector.h \
     GeometryConstraint.h \
-    PeoplePlot.h
+    PeoplePlot.h \
+    GlobalConfig.h
 
 FORMS    += mainwindow.ui
 

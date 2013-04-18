@@ -3,6 +3,7 @@
 
 #include "Annotate.h"
 #include "Camera.h"
+#include "GlobalConfig.h"
 #include "PeoplePlot.h"
 #include <QAction>
 #include <QLabel>
@@ -14,13 +15,6 @@
 #include <QWidget>
 #include "Utility.h"
 #include "WalnutDetector.h"
-
-#define THUMBNAIL_WIDTH 320
-#define THUMBNAIL_HEIGHT 240
-#define FULL_WIDTH 640
-#define FULL_HEIGHT 480
-
-#define ANNOTATE_PATH "/home/zxwang/Dropbox/data/iroom/annotate"
 
 // this class creates the ui for the camera.
 class CameraView : public QWidget

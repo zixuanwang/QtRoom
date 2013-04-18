@@ -5,8 +5,8 @@ CameraView::CameraView(const std::string& ip_address, const std::string& usernam
     connect(m_camera.get(), SIGNAL(image_changed()), this, SLOT(image_changed()));
     m_type = CAMERA;
     m_id = ip_address;
-    setFixedWidth(THUMBNAIL_WIDTH);
-    setFixedHeight(THUMBNAIL_HEIGHT);
+    setFixedWidth(GlobalConfig::THUMBNAIL_WIDTH);
+    setFixedHeight(GlobalConfig::THUMBNAIL_HEIGHT);
     init();
     m_camera->start();
 }
@@ -17,12 +17,12 @@ CameraView::CameraView(const std::string& video_path, Type type){
     m_type = type;
     m_id = Utility::get_stem(video_path);
     if(m_type == ANNOTATE){
-        setFixedWidth(FULL_WIDTH);
-        setFixedHeight(FULL_HEIGHT);
+        setFixedWidth(GlobalConfig::FULL_WIDTH);
+        setFixedHeight(GlobalConfig::FULL_HEIGHT);
     }
     if(m_type == VIDEO){
-        setFixedWidth(THUMBNAIL_WIDTH);
-        setFixedHeight(THUMBNAIL_HEIGHT);
+        setFixedWidth(GlobalConfig::THUMBNAIL_WIDTH);
+        setFixedHeight(GlobalConfig::THUMBNAIL_HEIGHT);
     }
     init();
 }
@@ -41,12 +41,13 @@ void CameraView::init(){
     m_action_plot = std::shared_ptr<QAction>(new QAction(QIcon(plot_pix), "Show Plot", this));
     connect(m_action_plot.get(), SIGNAL(triggered()), this, SLOT(show_plot()));
     m_pick_rect_index = -1;
+    m_mode = NORMAL; // set the initial mode.s
 }
 
 void CameraView::set_mode(MODE mode){
     m_mode = mode;
     std::stringstream ss;
-    ss << ANNOTATE_PATH << "/" << m_id;
+    ss << GlobalConfig::ANNOTATE_PATH << "/" << m_id;
     if(m_mode == CASCADE){
         if(m_people_detector == nullptr){
             m_people_detector = std::shared_ptr<PeopleDetector>(new CascadeDetector(ss.str()));
@@ -167,7 +168,7 @@ void CameraView::keyPressEvent(QKeyEvent *event){
         // save image and bounding box
         m_annotate.set_image(m_image_buffer, m_timestamp);
         std::stringstream ss;
-        ss << ANNOTATE_PATH << "/" << m_id;
+        ss << GlobalConfig::ANNOTATE_PATH << "/" << m_id;
         m_annotate.save(ss.str());
     }
     if(event->key() == Qt::Key_D){

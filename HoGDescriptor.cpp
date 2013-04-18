@@ -88,7 +88,7 @@ void HoGDescriptor::compute_hog(const cv::Mat& magnitude, const cv::Mat& angle, 
         for(int col = 0; col < sub_magnitude.cols - 1; ++col){
             float mag = mag_row_ptr[col];
             float ang = angle_row_ptr[col];
-            int bin_index = m_num_bins * (ang / PI +  0.5f);
+            int bin_index = m_num_bins * (ang / boost::math::constants::pi<float>() +  0.5f);
             //std::cout << bin_index << std::endl;
             if(bin_index == m_num_bins){
                 bin_index = m_num_bins - 1;

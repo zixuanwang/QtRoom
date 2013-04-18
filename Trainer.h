@@ -1,12 +1,10 @@
 #ifndef TRAINER_H
 #define TRAINER_H
 
+#include "GlobalConfig.h"
 #include "HoGDescriptor.h"
 #include "SVMClassifier.h"
 #include "Utility.h"
-
-#define PATCH_WIDTH 64
-#define PATCH_HEIGHT 64
 
 class Trainer
 {
