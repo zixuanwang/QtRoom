@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     Trainer.cpp \
     WalnutDetector.cpp \
     CascadeDetector.cpp \
-    GeometryConstraint.cpp
+    GeometryConstraint.cpp \
+    PeoplePlot.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
@@ -47,15 +48,15 @@ HEADERS  += mainwindow.h \
     Trainer.h \
     WalnutDetector.h \
     CascadeDetector.h \
-    GeometryConstraint.h
+    GeometryConstraint.h \
+    PeoplePlot.h
 
 FORMS    += mainwindow.ui
 
 # change the following
 
 QMAKE_CXXFLAGS += -Wall -std=c++11
-INCLUDEPATH += /usr/local/include
-LIBS += -L/usr/local/lib -lcurl -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_objdetect -lopencv_ml -lboost_system -lboost_filesystem
+INCLUDEPATH += /usr/local/include /usr/local/qwt-6.0.3-svn/include
+LIBS += -L/usr/local/lib -L/usr/local/qwt-6.0.3-svn/lib -lqwt -lcurl -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_objdetect -lopencv_ml -lboost_system -lboost_filesystem
 
-RESOURCES += \
-    Res.qrc
+RESOURCES += Res.qrc

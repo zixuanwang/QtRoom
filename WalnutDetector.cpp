@@ -22,9 +22,9 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
     m_motion_descriptor.compute(image);
     for(size_t i = 0; i < rect_vector.size(); ++i){
         float score = m_motion_descriptor.get_motion_score(rect_vector[i]) / (rect_vector[i].width * rect_vector[i].height);
-        if(score > 0.5f)
+        if(score > 1.f)
             bbox.push_back(rect_vector[i]);
-        //qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
+        qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
     }
     geometry_filter(bbox);
     //temporal_filter(bbox);

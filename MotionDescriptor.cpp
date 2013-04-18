@@ -46,9 +46,25 @@ void MotionDescriptor::compute(const cv::Mat& image){
                 m_flow_magnitude.at<float>(y, x) = sqrtf(fxy.x * fxy.x + fxy.y * fxy.y);
             }
         }
-        cv::accumulateWeighted(m_flow_magnitude, m_motion_map, 0.1);
+        //average_motion_map();
+        max_motion_map();
     }
 	m_prev = gray.clone();
+}
+
+void MotionDescriptor::average_motion_map(){
+    cv::accumulateWeighted(m_flow_magnitude, m_motion_map, 0.1);
+}
+
+void MotionDescriptor::max_motion_map(){
+    if(m_flow_magnitude_list.size() > 30)
+        m_flow_magnitude_list.pop_front();
+    m_flow_magnitude_list.push_back(m_flow_magnitude.clone());
+    cv::Mat max_mat(m_flow_magnitude.size(), CV_32FC1, cv::Scalar(0));
+    for(auto iter = m_flow_magnitude_list.begin(); iter != m_flow_magnitude_list.end(); ++iter){
+        max_mat = cv::max(max_mat, *iter);
+    }
+    m_motion_map = max_mat;
 }
 
 float MotionDescriptor::get_motion_score(const cv::Rect& bbox){

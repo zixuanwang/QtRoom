@@ -6,11 +6,24 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     MainWindow w;
     w.show();
-    cv::Mat mat(3, 3, CV_8UC1, cv::Scalar(0));
-    mat -= 1;
-//    mat.at<uchar>(0,0) <<= 1;
-//    std::bitset<10> b(mat.at<uchar>(0,0));
-//    qDebug() << b.count();
-    qDebug() << (int)mat.at<uchar>(0, 0);
+//    QWidget vBox;
+//    vBox.setWindowTitle( "People Plot" );
+
+//    PeoplePlot *plot = new PeoplePlot( &vBox );
+//    plot->setTitle( "History" );
+
+//    const int margin = 5;
+//    plot->setContentsMargins( margin, margin, margin, margin );
+
+//    QString info( "Press the legend to en/disable a curve" );
+
+//    QLabel *label = new QLabel( info, &vBox );
+
+//    QVBoxLayout *layout = new QVBoxLayout( &vBox );
+//    layout->addWidget( plot );
+//    layout->addWidget( label );
+
+//    vBox.resize( 600, 400 );
+//    vBox.show();
     return app.exec();
 }

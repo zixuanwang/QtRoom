@@ -15,7 +15,7 @@ cv::Mat CascadeDetector::debug(const cv::Mat& image){
 }
 
 void CascadeDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
-    m_classifier.detectMultiScale(image, bbox);
+    m_classifier.detectMultiScale(image, bbox, 1.1, 3, 0, cv::Size(30, 30), cv::Size(100, 100));
 }
 
 int CascadeDetector::get_count(){

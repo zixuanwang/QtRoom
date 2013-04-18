@@ -3,9 +3,14 @@
 
 #include "Annotate.h"
 #include "Camera.h"
+#include "PeoplePlot.h"
+#include <QAction>
+#include <QLabel>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QtGui>
 #include <QToolTip>
+#include <QVBoxLayout>
 #include <QWidget>
 #include "Utility.h"
 #include "WalnutDetector.h"
@@ -39,6 +44,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent*);
     void keyPressEvent(QKeyEvent*);
+    void contextMenuEvent(QContextMenuEvent*);
 private:
     std::shared_ptr<Camera> m_camera;
     cv::VideoCapture m_video_capture;
@@ -57,11 +63,19 @@ private:
     ColorDescriptor m_color_descriptor;
     HoGDescriptor m_hog_descriptor;
     MotionDescriptor m_motion_descriptor;
+    // show plot
+    std::shared_ptr<QAction> m_action_plot;
+    std::shared_ptr<QWidget> m_plot_widget;
+    std::shared_ptr<PeoplePlot> m_plot;
+    std::shared_ptr<QVBoxLayout> m_plot_layout;
+
+
 signals:
 
 public slots:
     void image_changed();
     void read_image();
+    void show_plot();
 };
 
 #endif // CAMERAVIEW_H

@@ -37,6 +37,9 @@ CameraView::~CameraView(){
 }
 
 void CameraView::init(){
+    QPixmap plot_pix(":/new/my_resources/draw-path.png");
+    m_action_plot = std::shared_ptr<QAction>(new QAction(QIcon(plot_pix), "Show Plot", this));
+    connect(m_action_plot.get(), SIGNAL(triggered()), this, SLOT(show_plot()));
     m_pick_rect_index = -1;
 }
 
@@ -71,7 +74,7 @@ cv::Mat CameraView::process_image(cv::Mat& image){
         std::vector<cv::Rect> rect_vector;
         m_people_detector->detect(image, rect_vector);
         m_people_detector->draw(image, rect_vector);
-        qDebug() << m_id.c_str() << "\t" << m_people_detector->get_count();
+        //qDebug() << m_id.c_str() << "\t" << m_people_detector->get_count();
     }
     if(m_mode == BACKGROUND){
         cv::Mat foreground;
@@ -165,6 +168,12 @@ void CameraView::keyPressEvent(QKeyEvent *event){
     repaint();
 }
 
+void CameraView::contextMenuEvent(QContextMenuEvent* event){
+    QMenu menu(this);
+    menu.addAction(m_action_plot.get());
+    menu.exec(event->globalPos());
+}
+
 void CameraView::image_changed(){
     repaint();
 }
@@ -174,4 +183,17 @@ void CameraView::read_image(){
         m_video_capture >> m_image_buffer;
         repaint();
     }
+}
+
+void CameraView::show_plot(){
+    m_plot_widget = std::shared_ptr<QWidget>(new QWidget);
+    m_plot_widget->setWindowTitle("People Plot");
+    m_plot = std::shared_ptr<PeoplePlot>(new PeoplePlot(m_plot_widget.get()));
+    m_plot->setTitle("History");
+    const int margin = 5;
+    m_plot->setContentsMargins( margin, margin, margin, margin );
+    m_plot_layout = std::shared_ptr<QVBoxLayout>(new QVBoxLayout(m_plot_widget.get()));
+    m_plot_layout->addWidget(m_plot.get());
+    m_plot_widget->resize(600, 400);
+    m_plot_widget->show();
 }
