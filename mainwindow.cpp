@@ -25,7 +25,6 @@ void MainWindow::init_actions(){
     QPixmap annotate_pix(":/new/my_resources/document-sign-2.png");
     QPixmap group_pix(":/new/my_resources/edit-group.png");
     QPixmap background_pix(":/new/my_resources/tab-detach.png");
-    QPixmap edge_pix(":/new/my_resources/draw-freehand.png");
     QPixmap optical_flow_pix(":/new/my_resources/tools-wizard-3.png");
     QPixmap walnut_pix(":/new/my_resources/food-kiwi.png");
     m_action_load_config = std::shared_ptr<QAction>(new QAction(QIcon(new_pix), "Load Config", this));
@@ -54,14 +53,14 @@ void MainWindow::init_actions(){
     m_action_background_subtraction->setCheckable(true);
     m_action_background_subtraction->setDisabled(true);
     connect(m_action_background_subtraction.get(), SIGNAL(toggled(bool)), this, SLOT(background_subtraction(bool)));
-    m_action_edge_detection = std::shared_ptr<QAction>(new QAction(QIcon(edge_pix), "Gradient", this));
-    m_action_edge_detection->setCheckable(true);
-    m_action_edge_detection->setDisabled(true);
-    connect(m_action_edge_detection.get(), SIGNAL(toggled(bool)), this, SLOT(edge_detection(bool)));
     m_action_optical_flow = std::shared_ptr<QAction>(new QAction(QIcon(optical_flow_pix), "Optical Flow", this));
     m_action_optical_flow->setCheckable(true);
     m_action_optical_flow->setDisabled(true);
     connect(m_action_optical_flow.get(), SIGNAL(toggled(bool)), this, SLOT(optical_flow(bool)));
+    m_action_motion_map = std::shared_ptr<QAction>(new QAction("Motion Map", this));
+    m_action_motion_map->setCheckable(true);
+    m_action_motion_map->setDisabled(true);
+    connect(m_action_motion_map.get(), SIGNAL(toggled(bool)), this, SLOT(motion_map(bool)));
     m_action_train_hog = std::shared_ptr<QAction>(new QAction("Train HoG", this));
     connect(m_action_train_hog.get(), SIGNAL(triggered()), this, SLOT(train_hog()));
     m_action_prepare_cascade = std::shared_ptr<QAction>(new QAction("Prepare Cascade", this));
@@ -85,8 +84,9 @@ void MainWindow::init_menubar(){
     QMenu* detectMenu = menuBar()->addMenu(tr("&Detect"));
     detectMenu->addAction(m_action_cascade_detection.get());
     detectMenu->addAction(m_action_background_subtraction.get());
-    detectMenu->addAction(m_action_edge_detection.get());
     detectMenu->addAction(m_action_optical_flow.get());
+    detectMenu->addAction(m_action_motion_map.get());
+    detectMenu->addSeparator();
     detectMenu->addAction(m_action_walnut_detection.get());
     QMenu* trainMenu = menuBar()->addMenu(tr("&Train"));
     trainMenu->addAction(m_action_train_hog.get());
@@ -105,7 +105,6 @@ void MainWindow::init_toolbar(){
     toolbar->addAction(m_action_stop_recording.get());
     toolbar->addAction(m_action_cascade_detection.get());
     toolbar->addAction(m_action_background_subtraction.get());
-    toolbar->addAction(m_action_edge_detection.get());
     toolbar->addAction(m_action_optical_flow.get());
     toolbar->addAction(m_action_walnut_detection.get());
 }
@@ -134,8 +133,8 @@ void MainWindow::enable_buttons(){
     m_action_start_recording->setDisabled(false);
     m_action_cascade_detection->setDisabled(false);
     m_action_background_subtraction->setDisabled(false);
-    m_action_edge_detection->setDisabled(false);
     m_action_optical_flow->setDisabled(false);
+    m_action_motion_map->setDisabled(false);
     m_action_walnut_detection->setDisabled(false);
 }
 
@@ -186,15 +185,15 @@ void MainWindow::background_subtraction(bool run){
     }
 }
 
-void MainWindow::edge_detection(bool run){
-    for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
-        m_camera_view_vector[i]->set_mode(run ? CameraView::EDGE : CameraView::NORMAL);
-    }
-}
-
 void MainWindow::optical_flow(bool run){
     for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
         m_camera_view_vector[i]->set_mode(run ? CameraView::OPTICAL_FLOW : CameraView::NORMAL);
+    }
+}
+
+void MainWindow::motion_map(bool run){
+    for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
+        m_camera_view_vector[i]->set_mode(run ? CameraView::MOTION_MAP : CameraView::NORMAL);
     }
 }
 

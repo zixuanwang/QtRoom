@@ -35,8 +35,8 @@ public slots:
     void pick_video();
     void cascade_detection(bool);
     void background_subtraction(bool);
-    void edge_detection(bool);
     void optical_flow(bool);
+    void motion_map(bool);
     void walnut_detection(bool);
     void load_config(const std::string& config_path);
     void status_timer_timeout();
@@ -66,8 +66,8 @@ private:
     std::shared_ptr<QAction> m_action_stop_recording;
     std::shared_ptr<QAction> m_action_cascade_detection;
     std::shared_ptr<QAction> m_action_background_subtraction;
-    std::shared_ptr<QAction> m_action_edge_detection;
     std::shared_ptr<QAction> m_action_optical_flow;
+    std::shared_ptr<QAction> m_action_motion_map;
     std::shared_ptr<QAction> m_action_train_hog;
     std::shared_ptr<QAction> m_action_prepare_cascade;
     std::shared_ptr<QAction> m_action_walnut_detection;

@@ -28,7 +28,7 @@ class CameraView : public QWidget
     Q_OBJECT
 public:
     enum Type{CAMERA, VIDEO, ANNOTATE};
-    enum MODE{NORMAL, CASCADE, BACKGROUND, EDGE, OPTICAL_FLOW, WALNUT};
+    enum MODE{NORMAL, CASCADE, BACKGROUND, OPTICAL_FLOW, MOTION_MAP, WALNUT};
     CameraView(const std::string& ip_address, const std::string& username, const std::string& password);
     CameraView(const std::string& video_path, Type type);
     void init();

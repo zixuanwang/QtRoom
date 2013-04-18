@@ -88,6 +88,15 @@ cv::Mat CameraView::process_image(cv::Mat& image){
         cv::Mat flow = m_motion_descriptor.get_flow();
         m_motion_descriptor.draw_optical_flow(flow, image, 16);
     }
+    if(m_mode == MOTION_MAP){
+        m_motion_descriptor.compute(image);
+        cv::Mat motion_map = m_motion_descriptor.get_motion_map();
+        cv::Mat normalize_motion_map;
+        Utility::normalize_image(motion_map, normalize_motion_map);
+        cv::Mat gray_motion_map;
+        normalize_motion_map.convertTo(gray_motion_map, CV_8UC1, 255.0);
+        cv::cvtColor(gray_motion_map, image, CV_GRAY2BGR);
+    }
     cv::Mat preview_image;
     cv::resize(image, preview_image, cv::Size(width(), height()));
     return preview_image;
