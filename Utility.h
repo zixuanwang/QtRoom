@@ -6,6 +6,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <chrono>
 #include <fstream>
+#include "GlobalConfig.h"
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <QDebug>

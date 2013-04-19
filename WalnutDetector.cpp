@@ -24,10 +24,10 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
         float score = m_motion_descriptor.get_motion_score(rect_vector[i]) / (rect_vector[i].width * rect_vector[i].height);
         if(score > 1.f)
             bbox.push_back(rect_vector[i]);
-        qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
+        //qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
     }
     geometry_filter(bbox);
-    //temporal_filter(bbox);
+    compute_belief(bbox);
     m_count = static_cast<int>(bbox.size());
 }
 
@@ -105,7 +105,19 @@ void WalnutDetector::temporal_filter(std::vector<cv::Rect>& bbox){
     bbox.assign(filter_box.begin(), filter_box.end());
 }
 
-void WalnutDetector::overlap_filter(std::vector<cv::Rect>& bbox){
-    // TODO: need better implementation
-
+void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
+    if(m_belief_map.empty()){
+        m_belief_map = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_8UC1, cv::Scalar(0));
+    }
+    cv::Mat object_binary = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_8UC1, cv::Scalar(0));
+    for(size_t i = 0; i < bbox.size(); ++i){
+        cv::Mat sub_object_binary = object_binary(bbox[i]);
+        sub_object_binary = 1;
+    }
+    m_belief_map_list.push_back(object_binary);
+    m_belief_map += object_binary;
+    if(m_belief_map_list.size() > 10){
+        m_belief_map -= m_belief_map_list.front();
+        m_belief_map_list.pop_front();
+    }
 }

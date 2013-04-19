@@ -7,6 +7,8 @@
 
 #include "MotionDescriptor.h"
 
+const int MotionDescriptor::ARRAY_SIZE = 30;
+
 MotionDescriptor::MotionDescriptor() {
 
 }
@@ -48,12 +50,36 @@ void MotionDescriptor::compute(const cv::Mat& image){
         }
         //average_motion_map();
         max_motion_map();
+        //nth_motion_map(3); // 100 times slower than max_motion_map.
     }
 	m_prev = gray.clone();
 }
 
 void MotionDescriptor::average_motion_map(){
     cv::accumulateWeighted(m_flow_magnitude, m_motion_map, 0.1);
+}
+
+void MotionDescriptor::nth_motion_map(int n){
+    if(m_flow_magnitude_array.empty()){
+        m_flow_magnitude_array = boost::multi_array<float, 3>(boost::extents[GlobalConfig::FULL_HEIGHT][GlobalConfig::FULL_WIDTH][ARRAY_SIZE]);
+        std::fill(m_flow_magnitude_array.data(), m_flow_magnitude_array.data() + m_flow_magnitude_array.num_elements(), 0.f);
+        m_array_pos = 0;
+    }
+    std::greater<float> greater;
+    float array_buffer[ARRAY_SIZE];
+    for(int row = 0; row < m_flow_magnitude.rows; ++row){
+        float* flow_row_ptr = m_flow_magnitude.ptr<float>(row);
+        float* motion_row_ptr = m_motion_map.ptr<float>(row);
+        for(int col = 0; col < m_flow_magnitude.cols; ++col){
+            m_flow_magnitude_array[row][col][m_array_pos] = flow_row_ptr[col];
+            std::copy(m_flow_magnitude_array[row][col].begin(), m_flow_magnitude_array[row][col].end(), array_buffer);
+            std::nth_element(array_buffer, array_buffer + n, array_buffer + ARRAY_SIZE, greater); // find the nth largest magnitude.
+            motion_row_ptr[col] = array_buffer[n];
+        }
+    }
+    ++m_array_pos;
+    if(m_array_pos >= ARRAY_SIZE)
+        m_array_pos = 0;
 }
 
 void MotionDescriptor::max_motion_map(){
