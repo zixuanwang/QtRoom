@@ -7,7 +7,6 @@
 #include "GeometryConstraint.h"
 #include "HoGDescriptor.h"
 #include "MotionDescriptor.h"
-#include "PeopleDetector.h"
 #include "SVMClassifier.h"
 #include "Utility.h"
 
@@ -15,18 +14,18 @@
 
 /// this class implements more accurate people detector in the iroom.
 
-class WalnutDetector : public PeopleDetector
+class WalnutDetector
 {
 public:
     WalnutDetector(const std::string&);
     ~WalnutDetector();
     void detect(const cv::Mat& image, std::vector<cv::Rect>& bbox);
-    cv::Mat debug(const cv::Mat& image);
     void set_geometry_config(const std::string& config_path);
     void geometry_filter(std::vector<cv::Rect>& bbox); // use the geometry of the camera to filter bounding boxes which are too large or too small.
     void temporal_filter(std::vector<cv::Rect>& bbox); // use the temporal information to smooth the detection result.
     void compute_belief(std::vector<cv::Rect>& bbox); // clustering using minshift.
     cv::Mat get_belief_map(){return m_belief_map;}
+    void draw(cv::Mat& image, const std::vector<cv::Rect>& bbox);
     int get_count(){return m_count;}
 private:
     int m_count;
@@ -38,7 +37,6 @@ private:
     SVMClassifier m_svm_classifier;
     cv::Mat m_belief_map;
     std::list<cv::Mat> m_belief_map_list;
-
     cv::Mat m_temporal_record; // each pixel records the count of this pixel classified as people in recent 16 frames.
 };
 

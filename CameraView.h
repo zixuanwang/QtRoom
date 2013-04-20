@@ -53,7 +53,8 @@ private:
     std::string m_id; // ip address of the camera.
     Annotate m_annotate;
     int m_pick_rect_index; // the index of the picked rect.
-    std::shared_ptr<PeopleDetector> m_people_detector;
+    std::shared_ptr<WalnutDetector> m_walnut_detector;
+    std::shared_ptr<CascadeDetector> m_cascade_detector;
     ColorDescriptor m_color_descriptor;
     HoGDescriptor m_hog_descriptor;
     MotionDescriptor m_motion_descriptor;
@@ -62,8 +63,6 @@ private:
     std::shared_ptr<QWidget> m_plot_widget;
     std::shared_ptr<PeoplePlot> m_plot;
     std::shared_ptr<QVBoxLayout> m_plot_layout;
-
-
 signals:
 
 public slots:

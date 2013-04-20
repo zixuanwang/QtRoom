@@ -16,7 +16,6 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     Camera.cpp \
     Utility.cpp \
-    PeopleDetector.cpp \
     CameraView.cpp \
     Annotate.cpp \
     MotionDescriptor.cpp \
@@ -36,7 +35,6 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     Camera.h \
     Utility.h \
-    PeopleDetector.h \
     CameraView.h \
     Annotate.h \
     MotionDescriptor.h \

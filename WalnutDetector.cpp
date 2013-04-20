@@ -4,7 +4,6 @@ WalnutDetector::WalnutDetector(const std::string& annotate_path) : m_count(0), m
     std::stringstream ss;
     ss << annotate_path << "/geometry.conf";
     set_geometry_config(ss.str());
-    m_temporal_record = cv::Mat(480, 640, CV_16UC1, cv::Scalar(0));
 }
 
 WalnutDetector::~WalnutDetector(){
@@ -16,7 +15,6 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
         bbox.clear();
     if(image.empty())
         return;
-
     std::vector<cv::Rect> rect_vector;
     m_cascade_detector.detect(image, rect_vector);
     m_motion_descriptor.compute(image);
@@ -24,20 +22,11 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
         float score = m_motion_descriptor.get_motion_score(rect_vector[i]) / (rect_vector[i].width * rect_vector[i].height);
         if(score > 1.f)
             bbox.push_back(rect_vector[i]);
-        //qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
+        qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
     }
     geometry_filter(bbox);
     compute_belief(bbox);
     m_count = static_cast<int>(bbox.size());
-}
-
-cv::Mat WalnutDetector::debug(const cv::Mat& image){
-    m_motion_descriptor.compute(image);
-    cv::Mat map = m_motion_descriptor.get_motion_map();
-    cv::Mat normalize_map;
-    Utility::normalize_image(map, normalize_map);
-    cv::imwrite("/home/zxwang/Desktop/1.jpg", normalize_map);
-    return image;
 }
 
 void WalnutDetector::set_geometry_config(const std::string& config_path){
@@ -77,6 +66,8 @@ void WalnutDetector::geometry_filter(std::vector<cv::Rect>& bbox){
 void WalnutDetector::temporal_filter(std::vector<cv::Rect>& bbox){
     if(bbox.empty())
         return;
+    if(m_temporal_record.empty())
+        m_temporal_record = cv::Mat(480, 640, CV_16UC1, cv::Scalar(0));
     std::vector<cv::Rect> filter_box;
     for(size_t i = 0; i < bbox.size(); ++i){
         cv::Mat subfilter = m_temporal_record(bbox[i]);
@@ -116,8 +107,12 @@ void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
     }
     m_belief_map_list.push_back(object_binary);
     m_belief_map += object_binary;
-    if(m_belief_map_list.size() > 10){
+    if(m_belief_map_list.size() > 20){
         m_belief_map -= m_belief_map_list.front();
         m_belief_map_list.pop_front();
     }
+}
+
+void WalnutDetector::draw(cv::Mat& image, const std::vector<cv::Rect>& bbox){
+    m_cascade_detector.draw(image, bbox);
 }

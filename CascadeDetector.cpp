@@ -10,14 +10,10 @@ CascadeDetector::~CascadeDetector(){
 
 }
 
-cv::Mat CascadeDetector::debug(const cv::Mat& image){
-    return image;
-}
-
 void CascadeDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
     m_classifier.detectMultiScale(image, bbox, 1.1, 3, 0, cv::Size(30, 30), cv::Size(100, 100));
 }
 
-int CascadeDetector::get_count(){
-    return 0;
+void CascadeDetector::draw(cv::Mat& image, const std::vector<cv::Rect>& bbox){
+    std::for_each(bbox.begin(), bbox.end(), [&](const cv::Rect& rect){cv::rectangle(image, rect, cv::Scalar(40,40,200), 2, CV_AA);});
 }

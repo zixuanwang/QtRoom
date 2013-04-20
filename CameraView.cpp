@@ -49,14 +49,12 @@ void CameraView::set_mode(MODE mode){
     std::stringstream ss;
     ss << GlobalConfig::ANNOTATE_PATH << "/" << m_id;
     if(m_mode == CASCADE){
-        if(m_people_detector == nullptr){
-            m_people_detector = std::shared_ptr<PeopleDetector>(new CascadeDetector(ss.str()));
-        }
+        if(m_cascade_detector == nullptr)
+            m_cascade_detector = std::shared_ptr<CascadeDetector>(new CascadeDetector(ss.str()));
     }
     if(m_mode == WALNUT || m_mode == BELIEF_MAP){
-        if(m_people_detector == nullptr){
-            m_people_detector = std::shared_ptr<PeopleDetector>(new WalnutDetector(ss.str()));
-        }
+        if(m_walnut_detector == nullptr)
+            m_walnut_detector = std::shared_ptr<WalnutDetector>(new WalnutDetector(ss.str()));
     }
 }
 
@@ -71,11 +69,15 @@ void CameraView::stop_recording(){
 cv::Mat CameraView::process_image(cv::Mat& image){
     if(image.empty())
         return cv::Mat();
-    if(m_mode == CASCADE || m_mode == WALNUT){
+    if(m_mode == CASCADE){
         std::vector<cv::Rect> rect_vector;
-        m_people_detector->detect(image, rect_vector);
-        m_people_detector->draw(image, rect_vector);
-        //qDebug() << m_id.c_str() << "\t" << m_people_detector->get_count();
+        m_cascade_detector->detect(image, rect_vector);
+        m_cascade_detector->draw(image, rect_vector);
+    }
+    if(m_mode == WALNUT){
+        std::vector<cv::Rect> rect_vector;
+        m_walnut_detector->detect(image, rect_vector);
+        m_walnut_detector->draw(image, rect_vector);
     }
     if(m_mode == BACKGROUND){
         cv::Mat foreground;
@@ -99,16 +101,13 @@ cv::Mat CameraView::process_image(cv::Mat& image){
         cv::cvtColor(gray_motion_map, image, CV_GRAY2BGR);
     }
     if(m_mode == BELIEF_MAP){
-        std::stringstream ss;
-        ss << GlobalConfig::ANNOTATE_PATH << "/" << m_id;
-        WalnutDetector detector(ss.str());
         std::vector<cv::Rect> rect_vector;
-        detector.detect(image, rect_vector);
-        detector.draw(image, rect_vector);
-        //cv::Mat belief_map = detector.get_belief_map();
-        //cv::Mat normalize_belief_map;
-        //Utility::normalize_image(belief_map, normalize_belief_map);
-        //cv::cvtColor(normalize_belief_map, image, CV_GRAY2BGR);
+        m_walnut_detector->detect(image, rect_vector);
+        m_walnut_detector->draw(image, rect_vector);
+        cv::Mat belief_map = m_walnut_detector->get_belief_map();
+        cv::Mat normalize_belief_map;
+        belief_map.convertTo(normalize_belief_map, CV_8UC1, 10.0);
+        cv::cvtColor(normalize_belief_map, image, CV_GRAY2BGR);
     }
     cv::Mat preview_image;
     cv::resize(image, preview_image, cv::Size(width(), height()));

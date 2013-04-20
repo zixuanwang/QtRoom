@@ -1,16 +1,15 @@
 #ifndef CASCADEDETECTOR_H
 #define CASCADEDETECTOR_H
 
-#include "PeopleDetector.h"
+#include "Utility.h"
 
-class CascadeDetector : public PeopleDetector
+class CascadeDetector
 {
 public:
     CascadeDetector(const std::string&);
     ~CascadeDetector();
     void detect(const cv::Mat& image, std::vector<cv::Rect>& bbox);
-    cv::Mat debug(const cv::Mat& image);
-    int get_count();
+    void draw(cv::Mat& image, const std::vector<cv::Rect>& bbox);
 private:
     cv::CascadeClassifier m_classifier;
 };
