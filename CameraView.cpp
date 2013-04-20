@@ -210,7 +210,8 @@ void CameraView::show_plot(){
     m_plot_widget = std::shared_ptr<QWidget>(new QWidget);
     m_plot_widget->setWindowTitle("People Plot");
     m_plot = std::shared_ptr<PeoplePlot>(new PeoplePlot(m_plot_widget.get()));
-    m_plot->setTitle("History");
+    m_plot->setTitle(m_id.c_str());
+    m_plot->set_walnut_detector(m_walnut_detector);
     const int margin = 5;
     m_plot->setContentsMargins( margin, margin, margin, margin );
     m_plot_layout = std::shared_ptr<QVBoxLayout>(new QVBoxLayout(m_plot_widget.get()));
