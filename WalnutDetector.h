@@ -7,6 +7,7 @@
 #include "GeometryConstraint.h"
 #include "HoGDescriptor.h"
 #include "MotionDescriptor.h"
+#include "ParticleFilter.h"
 #include "SVMClassifier.h"
 #include "Utility.h"
 

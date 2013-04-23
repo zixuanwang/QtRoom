@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     CascadeDetector.cpp \
     GeometryConstraint.cpp \
     PeoplePlot.cpp \
-    GlobalConfig.cpp
+    GlobalConfig.cpp \
+    ParticleFilter.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
@@ -49,7 +50,8 @@ HEADERS  += mainwindow.h \
     CascadeDetector.h \
     GeometryConstraint.h \
     PeoplePlot.h \
-    GlobalConfig.h
+    GlobalConfig.h \
+    ParticleFilter.h
 
 FORMS    += mainwindow.ui
 
