@@ -30,6 +30,7 @@ public:
     int get_count(){return m_count;}
 private:
     int m_count;
+    ParticleFilter m_particle_filter;
     CascadeDetector m_cascade_detector;
     std::shared_ptr<GeometryConstraint> m_geometry_constraint;
     ColorDescriptor m_color_descriptor;

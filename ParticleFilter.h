@@ -11,12 +11,15 @@ public:
     void init(const cv::Mat& image, const cv::Rect& bbox);
     void update(const cv::Mat& image);
     void get_color_model(const cv::Mat& patch, std::vector<float>& model);
-    float similarity(const std::vector<float>& v1, const std::vector<float>& v2);
+    float distance(const std::vector<float>& v1, const std::vector<float>& v2);
     float likelihood(const cv::Mat& patch);
     void transition(const cv::Mat& image); // pass the whole image
     void resample();
     void draw(cv::Mat& image);
+    bool is_init(){return m_init;}
+    int get_particle_count(){return static_cast<int>(m_point_vector.size());}
 private:
+    bool m_init;
     float m_std;
     int m_box_size;
     std::vector<cv::Point> m_point_vector;

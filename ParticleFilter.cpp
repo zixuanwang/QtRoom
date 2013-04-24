@@ -1,20 +1,31 @@
 #include "ParticleFilter.h"
 
-ParticleFilter::ParticleFilter()
-{
+ParticleFilter::ParticleFilter() : m_init(false){
 }
 
 void ParticleFilter::init(const cv::Mat& image, const cv::Rect& bbox){
+    int particle_count = 100;
+    float weight = 1.f / static_cast<float>(particle_count);
+    m_point_vector.clear();
+    m_point_vector.reserve(particle_count);
+    m_weight_vector.clear();
+    m_weight_vector.reserve(particle_count);
     get_color_model(image(bbox), m_color_template);
     m_box_size = bbox.width;
     m_std = static_cast<float>(bbox.width) * 0.05f;
     // initialize particles
     int center_x = bbox.x + bbox.width / 2;
     int center_y = bbox.y + bbox.height / 2;
-    for(int i = 0; i < 100; ++i){
+    for(int i = 0; i < particle_count; ++i){
         m_point_vector.push_back(cv::Point(center_x + m_normal(m_generator) * m_std, center_y + m_normal(m_generator) * m_std));
-        m_weight_vector.push_back(1.f);
+        m_weight_vector.push_back(weight);
     }
+    m_init = true;
+}
+
+void ParticleFilter::update(const cv::Mat& image){
+    transition(image);
+    resample();
 }
 
 void ParticleFilter::get_color_model(const cv::Mat& patch, std::vector<float>& model){
@@ -55,9 +66,11 @@ void ParticleFilter::get_color_model(const cv::Mat& patch, std::vector<float>& m
     Utility::l1_normalize(model);
 }
 
-float ParticleFilter::similarity(const std::vector<float>& v1, const std::vector<float>& v2){
-    if(v1.empty() || v2.empty() || v1.size() != v2.size())
-        return 0.f;
+float ParticleFilter::distance(const std::vector<float>& v1, const std::vector<float>& v2){
+    if(v1.empty() || v2.empty() || v1.size() != v2.size()){
+        std::cerr << "similarity error: wrong size" << std::endl;
+        return 1e6f;
+    }
     float sum = 0.f;
     for(size_t i = 0; i < v1.size(); ++i){
         sum += sqrtf(v1[i] * v2[i]);
@@ -66,29 +79,58 @@ float ParticleFilter::similarity(const std::vector<float>& v1, const std::vector
 }
 
 float ParticleFilter::likelihood(const cv::Mat& patch){
+    if(patch.empty())
+        return 0.f;
     std::vector<float> current_model;
     get_color_model(patch, current_model);
-    float distance = similarity(current_model, m_color_template);
-    return expf(-20.f * distance * distance);
+    float dist = distance(current_model, m_color_template);
+    return expf(-20.f * dist * dist);
 }
 
 void ParticleFilter::transition(const cv::Mat& image){
+    if(image.empty())
+        return;
+    std::vector<cv::Point> point_vector;
+    point_vector.reserve(m_point_vector.size());
+    m_weight_vector.clear();
+    m_weight_vector.reserve(m_point_vector.size());
     for(size_t i = 0; i < m_point_vector.size(); ++i){
-        m_point_vector[i].x += m_normal(m_generator) * m_std;
-        m_point_vector[i].y += m_normal(m_generator) * m_std;
-        cv::Point& pos = m_point_vector[i];
-        cv::Rect rect(pos.x - m_box_size / 2, pos.y - m_box_size / 2, m_box_size, m_box_size);
-        m_weight_vector[i] = likelihood(image(rect));
+        cv::Point point = m_point_vector[i];
+        point.x += m_normal(m_generator) * m_std;
+        point.y += m_normal(m_generator) * m_std;
+        if(point.x >= 0 && point.x < image.cols && point.y >= 0 && point.y < image.rows){
+            point_vector.push_back(point);
+            cv::Rect rect(point.x - m_box_size / 2, point.y - m_box_size / 2, m_box_size, m_box_size);
+            m_weight_vector.push_back(likelihood(image(rect & cv::Rect(0, 0, image.cols, image.rows))));
+        }
     }
     Utility::l1_normalize(m_weight_vector);
+    m_point_vector.assign(point_vector.begin(), point_vector.end());
 }
 
 void ParticleFilter::resample(){
-
+    int particle_count = static_cast<int>(m_weight_vector.size());
+    std::vector<cv::Point> point_vector;
+    point_vector.reserve(particle_count);
+    float step = 1.f / static_cast<float>(particle_count);
+    std::vector<float> cdf(particle_count, 0.f);
+    for(int i = 1; i < particle_count; ++i){
+        cdf[i] = cdf[i - 1] + m_weight_vector[i - 1];
+    }
+    std::uniform_real_distribution<float> uniform_dist(1e-6, step);
+    float base = uniform_dist(m_generator);
+    for(int i = 0; i < particle_count; ++i){
+        float u = base + step * i;
+        auto low = std::lower_bound(cdf.begin(), cdf.end(), u);
+        int pos = --low - cdf.begin();
+        point_vector.push_back(m_point_vector[pos]);
+    }
+    m_point_vector.assign(point_vector.begin(), point_vector.end());
+    m_weight_vector.assign(m_point_vector.size(), step);
 }
 
 void ParticleFilter::draw(cv::Mat& image){
     for(size_t i = 0; i < m_point_vector.size(); ++i){
-        cv::circle(image, m_point_vector[i], 2, cv::Scalar(220, 50, 40), 2, CV_AA);
+        cv::circle(image, m_point_vector[i], 2, cv::Scalar(220, 50, 40), 1, CV_AA);
     }
 }

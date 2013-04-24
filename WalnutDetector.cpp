@@ -26,6 +26,15 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
     }
     geometry_filter(bbox);
     compute_belief(bbox);
+    if(!bbox.empty()){
+        if(!m_particle_filter.is_init())
+            m_particle_filter.init(image, bbox[0]);
+        else{
+            m_particle_filter.update(image);
+            qDebug() << "Particle count: " << m_particle_filter.get_particle_count();
+        }
+
+    }
     m_count = static_cast<int>(bbox.size());
 }
 
@@ -115,4 +124,5 @@ void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
 
 void WalnutDetector::draw(cv::Mat& image, const std::vector<cv::Rect>& bbox){
     m_cascade_detector.draw(image, bbox);
+    m_particle_filter.draw(image);
 }
