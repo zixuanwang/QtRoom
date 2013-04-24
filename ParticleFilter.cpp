@@ -4,7 +4,7 @@ ParticleFilter::ParticleFilter() : m_init(false){
 }
 
 void ParticleFilter::init(const cv::Mat& image, const cv::Rect& bbox){
-    int particle_count = 100;
+    int particle_count = 20;
     float weight = 1.f / static_cast<float>(particle_count);
     m_point_vector.clear();
     m_point_vector.reserve(particle_count);

@@ -26,15 +26,15 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
     }
     geometry_filter(bbox);
     compute_belief(bbox);
-    if(!bbox.empty()){
-        if(!m_particle_filter.is_init())
-            m_particle_filter.init(image, bbox[0]);
-        else{
-            m_particle_filter.update(image);
-            qDebug() << "Particle count: " << m_particle_filter.get_particle_count();
-        }
+//    if(!bbox.empty()){
+//        if(!m_particle_filter.is_init())
+//            m_particle_filter.init(image, bbox[0]);
+//        else{
+//            m_particle_filter.update(image);
+//            qDebug() << "Particle count: " << m_particle_filter.get_particle_count();
+//        }
 
-    }
+//    }
     m_count = static_cast<int>(bbox.size());
 }
 
@@ -112,7 +112,11 @@ void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
     cv::Mat object_binary = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_8UC1, cv::Scalar(0));
     for(size_t i = 0; i < bbox.size(); ++i){
         cv::Mat sub_object_binary = object_binary(bbox[i]);
-        sub_object_binary = 1;
+        cv::Mat kernel_x = cv::getGaussianKernel(sub_object_binary.cols, sub_object_binary.cols / 8);
+        cv::Mat kernel_y = cv::getGaussianKernel(sub_object_binary.rows, sub_object_binary.rows / 8);
+        cv::Mat kernel = kernel_x * kernel_y.t();
+        kernel.convertTo(sub_object_binary, CV_8UC1, 1e5);
+        cv::imwrite("/home/zxwang/Desktop/test.jpg", sub_object_binary);
     }
     m_belief_map_list.push_back(object_binary);
     m_belief_map += object_binary;
@@ -124,5 +128,5 @@ void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
 
 void WalnutDetector::draw(cv::Mat& image, const std::vector<cv::Rect>& bbox){
     m_cascade_detector.draw(image, bbox);
-    m_particle_filter.draw(image);
+    //m_particle_filter.draw(image);
 }

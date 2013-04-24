@@ -30,6 +30,8 @@ void MotionDescriptor::draw_optical_flow(const cv::Mat& flow,
 }
 
 void MotionDescriptor::compute(const cv::Mat& image){
+    if(image.empty())
+        return;
 	cv::Mat gray = image;
 	if(image.type() == CV_8UC3){
 		cv::cvtColor(image, gray, CV_BGR2GRAY);

@@ -66,9 +66,10 @@ void CameraView::stop_recording(){
     m_camera->stop_recording();
 }
 
-cv::Mat CameraView::process_image(cv::Mat& image){
-    if(image.empty())
+cv::Mat CameraView::process_image(cv::Mat& frame_buffer){
+    if(frame_buffer.empty())
         return cv::Mat();
+    cv::Mat image = frame_buffer.clone();
     if(m_mode == CASCADE){
         std::vector<cv::Rect> rect_vector;
         m_cascade_detector->detect(image, rect_vector);
@@ -94,10 +95,8 @@ cv::Mat CameraView::process_image(cv::Mat& image){
     if(m_mode == MOTION_MAP){
         m_motion_descriptor.compute(image);
         cv::Mat motion_map = m_motion_descriptor.get_motion_map();
-        cv::Mat normalize_motion_map;
-        Utility::normalize_image(motion_map, normalize_motion_map);
         cv::Mat gray_motion_map;
-        normalize_motion_map.convertTo(gray_motion_map, CV_8UC1, 255.0);
+        motion_map.convertTo(gray_motion_map, CV_8UC1, 10.0);
         cv::cvtColor(gray_motion_map, image, CV_GRAY2BGR);
     }
     if(m_mode == BELIEF_MAP){
