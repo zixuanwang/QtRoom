@@ -50,7 +50,7 @@ void Utility::normalize_image(const cv::Mat& image, cv::Mat& output){
     double min_value;
     double max_value;
     cv::minMaxLoc(image, &min_value, &max_value);
-    if(image.type() == CV_32FC1)
+    if(image.type() == CV_32FC1 || image.type() == CV_64FC1)
         image.convertTo(output, CV_32FC1, 1.0 / max_value);
     if(image.type() == CV_8UC1)
         image.convertTo(output, CV_8UC1, 255.0/ max_value);

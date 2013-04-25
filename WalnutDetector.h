@@ -40,6 +40,7 @@ private:
     cv::Mat m_belief_map;
     std::list<cv::Mat> m_belief_map_list;
     cv::Mat m_temporal_record; // each pixel records the count of this pixel classified as people in recent 16 frames.
+    cv::Mat m_gaussian_template;
 };
 
 #endif // WALNUTDETECTOR_H

@@ -4,6 +4,11 @@ WalnutDetector::WalnutDetector(const std::string& annotate_path) : m_count(0), m
     std::stringstream ss;
     ss << annotate_path << "/geometry.conf";
     set_geometry_config(ss.str());
+    // create gaussian template
+    cv::Mat kernel_x = cv::getGaussianKernel(128, 16, CV_32F);
+    cv::Mat kernel_y = cv::getGaussianKernel(128, 16, CV_32F);
+    cv::Mat kernel = kernel_x * kernel_y.t();
+    Utility::normalize_image(kernel, m_gaussian_template);
 }
 
 WalnutDetector::~WalnutDetector(){
@@ -107,16 +112,14 @@ void WalnutDetector::temporal_filter(std::vector<cv::Rect>& bbox){
 
 void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
     if(m_belief_map.empty()){
-        m_belief_map = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_8UC1, cv::Scalar(0));
+        m_belief_map = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_32FC1, cv::Scalar(0));
     }
-    cv::Mat object_binary = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_8UC1, cv::Scalar(0));
+    cv::Mat object_binary = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_32FC1, cv::Scalar(0));
     for(size_t i = 0; i < bbox.size(); ++i){
         cv::Mat sub_object_binary = object_binary(bbox[i]);
-        cv::Mat kernel_x = cv::getGaussianKernel(sub_object_binary.cols, sub_object_binary.cols / 8);
-        cv::Mat kernel_y = cv::getGaussianKernel(sub_object_binary.rows, sub_object_binary.rows / 8);
-        cv::Mat kernel = kernel_x * kernel_y.t();
-        kernel.convertTo(sub_object_binary, CV_8UC1, 1e5);
-        cv::imwrite("/home/zxwang/Desktop/test.jpg", sub_object_binary);
+        cv::Mat gaussian;
+        cv::resize(m_gaussian_template, gaussian, cv::Size(sub_object_binary.cols, sub_object_binary.rows));
+        sub_object_binary += gaussian;
     }
     m_belief_map_list.push_back(object_binary);
     m_belief_map += object_binary;
