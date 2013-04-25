@@ -5,8 +5,8 @@ WalnutDetector::WalnutDetector(const std::string& annotate_path) : m_count(0), m
     ss << annotate_path << "/geometry.conf";
     set_geometry_config(ss.str());
     // create gaussian template
-    cv::Mat kernel_x = cv::getGaussianKernel(128, 16, CV_32F);
-    cv::Mat kernel_y = cv::getGaussianKernel(128, 16, CV_32F);
+    cv::Mat kernel_x = cv::getGaussianKernel(128, 24, CV_32F);
+    cv::Mat kernel_y = cv::getGaussianKernel(128, 24, CV_32F);
     cv::Mat kernel = kernel_x * kernel_y.t();
     Utility::normalize_image(kernel, m_gaussian_template);
 }
@@ -27,10 +27,11 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
         float score = m_motion_descriptor.get_motion_score(rect_vector[i]) / (rect_vector[i].width * rect_vector[i].height);
         if(score > 1.f)
             bbox.push_back(rect_vector[i]);
-        qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
+//        qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
     }
     geometry_filter(bbox);
     compute_belief(bbox);
+    merge(bbox);
 //    if(!bbox.empty()){
 //        if(!m_particle_filter.is_init())
 //            m_particle_filter.init(image, bbox[0]);
@@ -132,4 +133,36 @@ void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
 void WalnutDetector::draw(cv::Mat& image, const std::vector<cv::Rect>& bbox){
     m_cascade_detector.draw(image, bbox);
     //m_particle_filter.draw(image);
+}
+
+void WalnutDetector::merge(std::vector<cv::Rect>& bbox){
+    if(bbox.empty())
+        return;
+    // use mean shift to merge bbox
+    std::vector<cv::Rect> merge_bbox;
+    merge_bbox.reserve(bbox.size());
+    for(auto box : bbox){
+        cv::meanShift(m_belief_map, box, cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 50, 1.0));
+        merge_bbox.push_back(box);
+    }
+    std::vector<int> labels;
+    int nclasses = cv::partition(merge_bbox, labels, SimilarRects(9.0));
+    std::vector<cv::Rect> rrects(nclasses);
+    std::vector<int> rweights(nclasses, 0);
+    for(size_t i = 0; i < labels.size(); ++i){
+        int cls = labels[i];
+        rrects[cls].x += bbox[i].x;
+        rrects[cls].y += bbox[i].y;
+        rrects[cls].width += bbox[i].width;
+        rrects[cls].height += bbox[i].height;
+        rweights[cls]++;
+    }
+    for(int i = 0; i < nclasses; i++ ){
+        cv::Rect r = rrects[i];
+        float s = 1.f / rweights[i];
+        rrects[i] = cv::Rect(r.x * s, r.y * s, r.width * s, r.height * s);
+    }
+    qDebug() << "before merging: " << bbox.size();
+    bbox.assign(rrects.begin(), rrects.end());
+    qDebug() << "after merging: " << bbox.size();
 }
