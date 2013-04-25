@@ -162,7 +162,5 @@ void WalnutDetector::merge(std::vector<cv::Rect>& bbox){
         float s = 1.f / rweights[i];
         rrects[i] = cv::Rect(r.x * s, r.y * s, r.width * s, r.height * s);
     }
-    qDebug() << "before merging: " << bbox.size();
     bbox.assign(rrects.begin(), rrects.end());
-    qDebug() << "after merging: " << bbox.size();
 }
