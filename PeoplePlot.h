@@ -3,8 +3,8 @@
 
 #include <QPainter>
 #include <QTime>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
+#include <qwt/qwt_plot.h>
+#include <qwt/qwt_plot_curve.h>
 #include "WalnutDetector.h"
 #define HISTORY 60
 class PeoplePlot : public QwtPlot

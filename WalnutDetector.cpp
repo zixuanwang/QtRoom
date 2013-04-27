@@ -27,21 +27,15 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
         float score = m_motion_descriptor.get_motion_score(rect_vector[i]) / (rect_vector[i].width * rect_vector[i].height);
         if(score > 1.f)
             bbox.push_back(rect_vector[i]);
-//        qDebug() << i << " : " << score << "\t" << rect_vector[i].width;
     }
     geometry_filter(bbox);
-    compute_belief(bbox);
     merge(bbox);
-//    if(!bbox.empty()){
-//        if(!m_particle_filter.is_init())
-//            m_particle_filter.init(image, bbox[0]);
-//        else{
-//            m_particle_filter.update(image);
-//            qDebug() << "Particle count: " << m_particle_filter.get_particle_count();
-//        }
-
-//    }
-    m_count = static_cast<int>(bbox.size());
+    compute_belief(bbox);
+    if(m_count_list.size() > 20){
+        m_count_list.pop_front();
+    }
+    m_count_list.push_back(static_cast<int>(bbox.size()));
+    //m_count = static_cast<int>(bbox.size());
 }
 
 void WalnutDetector::set_geometry_config(const std::string& config_path){
@@ -133,6 +127,17 @@ void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
 void WalnutDetector::draw(cv::Mat& image, const std::vector<cv::Rect>& bbox){
     m_cascade_detector.draw(image, bbox);
     //m_particle_filter.draw(image);
+}
+
+std::pair<int, float> WalnutDetector::get_count_belief(){
+    if(m_count_list.empty())
+        return std::pair<int, float>(0, 0.f);
+    std::unordered_map<int, int> count_map;
+    for(int count : m_count_list){
+        count_map[count]++;
+    }
+    auto iter = std::max_element(count_map.begin(), count_map.end(), [](const std::pair<int, int>& a, const std::pair<int, int>& b){return a.second < b.second;});
+    return std::pair<int, float>(iter->first, static_cast<float>(iter->second) / m_count_list.size());
 }
 
 void WalnutDetector::merge(std::vector<cv::Rect>& bbox){

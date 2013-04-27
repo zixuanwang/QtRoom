@@ -1,11 +1,11 @@
 #include "PeoplePlot.h"
-#include <qwt_plot_layout.h>
-#include <qwt_plot_curve.h>
-#include <qwt_scale_draw.h>
-#include <qwt_scale_widget.h>
-#include <qwt_legend.h>
-#include <qwt_legend_item.h>
-#include <qwt_plot_canvas.h>
+#include <qwt/qwt_plot_layout.h>
+#include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_scale_draw.h>
+#include <qwt/qwt_scale_widget.h>
+#include <qwt/qwt_legend.h>
+#include <qwt/qwt_legend_item.h>
+#include <qwt/qwt_plot_canvas.h>
 
 class TimeScaleDraw: public QwtScaleDraw
 {
@@ -112,7 +112,7 @@ void PeoplePlot::timerEvent( QTimerEvent * ){
             data.data[i] = data.data[i-1];
     }
     if(m_walnut_detector != nullptr)
-        data.data[0] = m_walnut_detector->get_count();
+        data.data[0] = m_walnut_detector->get_count_belief().first;
     else
         data.data[0] = 0;
     if ( dataCount < HISTORY )

@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QImage>
 #include <random>
+#include <unordered_map>
 
 class Utility
 {

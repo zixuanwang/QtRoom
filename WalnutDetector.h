@@ -11,8 +11,6 @@
 #include "SVMClassifier.h"
 #include "Utility.h"
 
-#define HAAR_UPPER_BODY_PATH "/usr/local/share/OpenCV/haarcascades/haarcascade_upperbody.xml"
-
 /// this class implements more accurate people detector in the iroom.
 
 class WalnutDetector
@@ -27,7 +25,7 @@ public:
     void compute_belief(std::vector<cv::Rect>& bbox); // clustering using minshift.
     cv::Mat get_belief_map(){return m_belief_map;}
     void draw(cv::Mat& image, const std::vector<cv::Rect>& bbox);
-    int get_count(){return m_count;}
+    std::pair<int, float> get_count_belief();
     void merge(std::vector<cv::Rect>& bbox);
 private:
     int m_count;
@@ -42,6 +40,7 @@ private:
     std::list<cv::Mat> m_belief_map_list;
     cv::Mat m_temporal_record; // each pixel records the count of this pixel classified as people in recent 16 frames.
     cv::Mat m_gaussian_template;
+    std::list<int> m_count_list;
 };
 
 class SimilarRects
