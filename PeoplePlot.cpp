@@ -79,7 +79,7 @@ PeoplePlot::PeoplePlot( QWidget *parent ):
     setAutoReplot( false );
     canvas()->setBorderRadius( 10 );
     plotLayout()->setAlignCanvasToScales( true );
-    setAxisTitle( QwtPlot::xBottom, " System Uptime [h:m:s]" );
+    setAxisTitle( QwtPlot::xBottom, " System Time" );
 //    setAxisScaleDraw( QwtPlot::xBottom,
 //        new TimeScaleDraw( cpuStat.upTime() ) );
     setAxisScale( QwtPlot::xBottom, 0, HISTORY );
@@ -88,10 +88,10 @@ PeoplePlot::PeoplePlot( QWidget *parent ):
 
     QwtScaleWidget *scaleWidget = axisWidget( QwtPlot::xBottom );
     const int fmh = QFontMetrics( scaleWidget->font() ).height();
-    scaleWidget->setMinBorderDist( 0, fmh / 2 );
+    scaleWidget->setMinBorderDist( 0, fmh / 2);
 
-    setAxisTitle( QwtPlot::yLeft, "People Count" );
-    setAxisScale( QwtPlot::yLeft, 0, 10 );
+    setAxisTitle( QwtPlot::yLeft, "Occupancy Count" );
+    setAxisScale( QwtPlot::yLeft, 0, 15 );
 
     PeopleCurve *curve;
 
