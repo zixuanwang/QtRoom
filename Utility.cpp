@@ -46,6 +46,42 @@ void Utility::l2_normalize(std::vector<float>& v){
     }
 }
 
+float Utility::l1_norm(const std::unordered_map<int, float>& v){
+    float sum = 0.f;
+    for(auto &p : v){
+        sum += p.second;
+    }
+    return sum;
+}
+
+float Utility::l2_norm(const std::unordered_map<int, float>& v){
+    float sum = 0.f;
+    for(auto &p : v){
+        sum += p.second * p.second;
+    }
+    return sqrtf(sum);
+}
+
+void Utility::l1_normalize(std::unordered_map<int, float>& v){
+    float norm = l1_norm(v);
+    if(norm == 0.f){
+        std::cerr << "0 norm" << std::endl;
+    }else{
+        for(auto &p : v)
+            p.second /= norm;
+    }
+}\
+
+void Utility::l2_normalize(std::unordered_map<int, float>& v){
+    float norm = l2_norm(v);
+    if(norm == 0.f){
+        std::cerr << "0 norm" << std::endl;
+    }else{
+        for(auto &p : v)
+            p.second /= norm;
+    }
+}
+
 void Utility::normalize_image(const cv::Mat& image, cv::Mat& output){
     double min_value;
     double max_value;

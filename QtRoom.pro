@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     GeometryConstraint.cpp \
     PeoplePlot.cpp \
     GlobalConfig.cpp \
-    ParticleFilter.cpp
+    ParticleFilter.cpp \
+    FusionLayer.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
@@ -51,7 +52,8 @@ HEADERS  += mainwindow.h \
     GeometryConstraint.h \
     PeoplePlot.h \
     GlobalConfig.h \
-    ParticleFilter.h
+    ParticleFilter.h \
+    FusionLayer.h
 
 FORMS    += mainwindow.ui
 
