@@ -158,7 +158,7 @@ void CameraView::mouseMoveEvent(QMouseEvent *event){
         if(m_pick_rect_index != -1){
             m_annotate.move_rect(m_pick_rect_index, event->pos().x() - m_point_start.x() + m_point_topleft.x(), event->pos().y() - m_point_start.y() + m_point_topleft.y());
         }else{
-            m_rect_length = std::max(abs(event->pos().x() - m_point_start.x()), abs(event->pos().y() - m_point_start.y()));
+            m_rect_length = (abs(event->pos().x() - m_point_start.x()) > abs(event->pos().y() - m_point_start.y())) ? abs(event->pos().x() - m_point_start.x()) : abs(event->pos().y() - m_point_start.y());
             int x = event->pos().x() > m_point_start.x() ? m_point_start.x() : m_point_start.x() - m_rect_length;
             int y = event->pos().y() > m_point_start.y() ? m_point_start.y() : m_point_start.y() - m_rect_length;
             m_point_topleft = QPoint(x, y);

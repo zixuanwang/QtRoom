@@ -81,7 +81,7 @@ void WalnutDetector::temporal_filter(std::vector<cv::Rect>& bbox){
     for(size_t i = 0; i < bbox.size(); ++i){
         cv::Mat subfilter = m_temporal_record(bbox[i]);
         for(int row = 0; row < subfilter.rows; ++row){
-            u_int16_t *row_ptr = subfilter.ptr<u_int16_t>(row);
+            unsigned short *row_ptr = subfilter.ptr<unsigned short>(row);
             for(int col = 0; col < subfilter.cols; ++col){
                 row_ptr[col] <<= 1;
             }
@@ -91,7 +91,7 @@ void WalnutDetector::temporal_filter(std::vector<cv::Rect>& bbox){
     cv::Mat binary_image(m_temporal_record.size(), CV_8UC1, cv::Scalar(0));
     for(int row = 0; row < m_temporal_record.rows; ++row){
         for(int col = 0; col < m_temporal_record.cols; ++col){
-            std::bitset<16> bits(m_temporal_record.at<u_int16_t>(row, col));
+            std::bitset<16> bits(m_temporal_record.at<unsigned short>(row, col));
             if(bits.count() >= 6){
                 binary_image.at<uchar>(row, col) = 1;
             }
