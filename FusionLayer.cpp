@@ -1,7 +1,12 @@
 #include "FusionLayer.h"
 
-FusionLayer::FusionLayer()
-{
+FusionLayer* FusionLayer::p_instance = nullptr;
+
+FusionLayer* FusionLayer::instance(){
+	if(p_instance == nullptr){
+		p_instance = new FusionLayer;
+	}
+	return p_instance;
 }
 
 void FusionLayer::add_belief(const std::unordered_map<int, float>& count_belief_map){

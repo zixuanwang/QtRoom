@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "CameraView.h"
+#include "Geometry.h"
 #include "HoGDescriptor.h"
 #include <memory>
 #include <QDate>
