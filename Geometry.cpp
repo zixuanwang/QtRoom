@@ -42,14 +42,20 @@ void Geometry::paintEvent(QPaintEvent*){
 	if(m_mode == VALIDATE){
 		if(!m_point_vector.empty()){
 			std::vector<cv::Vec3f> lines;
-			int which_image = m_point_vector[0].x < m_image_width1 ? 1 : 2;
-			cv::computeCorrespondEpilines(m_point_vector, which_image, m_f, lines);
+			cv::computeCorrespondEpilines(m_point_vector, m_which_image, m_f, lines);
 			for(size_t i = 0; i < m_point_vector.size(); ++i){
 				painter.setPen(QPen(m_color_vector[i], 2));
-				painter.drawPoint(m_point_vector[i].x, m_point_vector[i].y);
-				int y1 = -1.0 * lines[i][2] / lines[i][1];
-				int y2 = -1.0 * lines[i][0] * m_image_width2 / lines[i][1] + y1;
-				painter.drawLine(m_image_width1, y1, m_image_width1 + m_image_width2, y2);
+				if(m_which_image == 1){
+					int y1 = -1.0 * lines[i][2] / lines[i][1];
+					int y2 = -1.0 * lines[i][0] * m_image_width2 / lines[i][1] + y1;
+					painter.drawPoint(m_point_vector[i].x, m_point_vector[i].y);
+					painter.drawLine(m_image_width1, y1, m_image_width1 + m_image_width2, y2);
+				}else{
+					int y1 = -1.0 * lines[i][2] / lines[i][1];
+					int y2 = -1.0 * lines[i][0] * m_image_width1 / lines[i][1] + y1;
+					painter.drawPoint(m_point_vector[i].x + m_image_width1, m_point_vector[i].y);
+					painter.drawLine(0, y1, m_image_width1, y2);
+				}
 			}
 		}
 	}
@@ -66,7 +72,12 @@ void Geometry::mousePressEvent(QMouseEvent* event){
 		}
 	}
 	if(m_mode == VALIDATE){
-		m_point_vector.push_back(cv::Point2f(event->pos().x(), event->pos().y()));
+		m_point_vector.push_back(cv::Point2f(event->pos().x() % m_image_width1, event->pos().y()));
+		if(event->pos().x() < m_image_width1){
+			m_which_image = 1;
+		}else{
+			m_which_image = 2;
+		}
 		QColor color(rand() % 256, rand() % 256, rand() % 256);
 		m_color_vector.push_back(color);
 	}

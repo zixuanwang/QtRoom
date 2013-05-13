@@ -27,5 +27,6 @@ protected:
 	cv::Mat m_f;
 	int m_mode;
 	std::vector<cv::Point2f> m_point_vector;
+	int m_which_image;
 };
 
