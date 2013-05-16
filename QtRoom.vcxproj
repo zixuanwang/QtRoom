@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="Annotate.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CameraCalibrator.cpp" />
     <ClCompile Include="CameraView.cpp" />
     <ClCompile Include="CascadeDetector.cpp" />
     <ClCompile Include="Classifier.cpp" />
@@ -225,6 +226,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Annotate.h" />
+    <ClInclude Include="CameraCalibrator.h" />
     <ClInclude Include="CascadeDetector.h" />
     <ClInclude Include="Classifier.h" />
     <ClInclude Include="ColorDescriptor.h" />

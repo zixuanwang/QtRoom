@@ -3,6 +3,7 @@
 
 #include "Annotate.h"
 #include "Camera.h"
+#include "CameraCalibrator.h"
 #include "GlobalConfig.h"
 #include "PeoplePlot.h"
 #include <QAction>
