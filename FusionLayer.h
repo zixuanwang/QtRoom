@@ -13,7 +13,7 @@ public:
 private:
 	FusionLayer(){}
 	FusionLayer(const FusionLayer&){}
-	FusionLayer& operator=(const FusionLayer&){}
+    FusionLayer& operator=(const FusionLayer&){return *this;}
     std::vector<std::unordered_map<int, float> > m_belief_map_vector;
     std::unordered_set<int> m_count_set;
 	static FusionLayer* p_instance;

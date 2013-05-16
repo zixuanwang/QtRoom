@@ -32,7 +32,9 @@ SOURCES += main.cpp\
     PeoplePlot.cpp \
     GlobalConfig.cpp \
     ParticleFilter.cpp \
-    FusionLayer.cpp
+    FusionLayer.cpp \
+    Geometry.cpp \
+    Graph.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
@@ -53,14 +55,16 @@ HEADERS  += mainwindow.h \
     PeoplePlot.h \
     GlobalConfig.h \
     ParticleFilter.h \
-    FusionLayer.h
+    FusionLayer.h \
+    Geometry.h \
+    Graph.h
 
 FORMS    += mainwindow.ui
 
 # change the following
 
 QMAKE_CXXFLAGS += -Wall -std=c++11
-INCLUDEPATH += /usr/local/include /usr/local/qwt-6.0.3-svn/include
-LIBS += -L/usr/local/lib -L/usr/local/qwt-6.0.3-svn/lib -lqwt -lcurl -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_objdetect -lopencv_ml -lboost_system -lboost_filesystem
+INCLUDEPATH += /usr/local/include
+LIBS += -L/usr/local/lib -lqwt -lcurl -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_video -lopencv_objdetect -lopencv_ml -lboost_system -lboost_filesystem
 
 RESOURCES += Res.qrc

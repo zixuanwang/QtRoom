@@ -14,6 +14,8 @@ public:
 	~Geometry(void);
 	void annotate(const std::string& image_path1, const std::string& image_path2);
 	void load_fundamental_matrix(const std::string& filepath);
+    bool line_intersect_line(const cv::Point& l1p1, const cv::Point& l1p2, const cv::Point& l2p1, const cv::Point& l2p2);
+    bool line_intersect_rect(const cv::Point& p1, const cv::Point& p2, const cv::Rect& r);
 protected:
 	void mousePressEvent(QMouseEvent*);
 	void paintEvent(QPaintEvent*);

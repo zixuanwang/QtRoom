@@ -26,6 +26,28 @@ void Geometry::load_fundamental_matrix(const std::string& filepath){
 	f.release();
 }
 
+bool Geometry::line_intersect_line(const cv::Point& l1p1, const cv::Point& l1p2, const cv::Point& l2p1, const cv::Point& l2p2){
+    float q = (l1p1.y - l2p1.y) * (l2p2.x - l2p1.x) - (l1p1.x - l2p1.x) * (l2p2.y - l2p1.y);
+    float d = (l1p2.x - l1p1.x) * (l2p2.y - l2p1.y) - (l1p2.y - l1p1.y) * (l2p2.x - l2p1.x);
+    if( d == 0 ){
+        return false;
+    }
+    float r = q / d;
+    q = (l1p1.y - l2p1.y) * (l1p2.x - l1p1.x) - (l1p1.x - l2p1.x) * (l1p2.y - l1p1.y);
+    float s = q / d;
+    if( r < 0 || r > 1 || s < 0 || s > 1 ){
+        return false;
+    }
+    return true;
+}
+
+bool Geometry::line_intersect_rect(const cv::Point& p1, const cv::Point& p2, const cv::Rect& r){
+    return line_intersect_line(p1, p2, cv::Point(r.x, r.y), cv::Point(r.x + r.width, r.y)) ||
+           line_intersect_line(p1, p2, cv::Point(r.x + r.width, r.y), cv::Point(r.x + r.width, r.y + r.height)) ||
+           line_intersect_line(p1, p2, cv::Point(r.x + r.width, r.y + r.height), cv::Point(r.x, r.y + r.height)) ||
+           line_intersect_line(p1, p2, cv::Point(r.x, r.y + r.height), cv::Point(r.x, r.y));
+}
+
 void Geometry::paintEvent(QPaintEvent*){
 	QPainter painter(this);
 	painter.drawImage(0, 0, Utility::mat2QImage(m_correspond));
