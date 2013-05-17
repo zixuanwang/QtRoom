@@ -10,6 +10,58 @@ Geometry::~Geometry(void)
 {
 }
 
+void Geometry::init_geometry(){
+	cv::FileStorage f1("C:/Users/Zixuan/Dropbox/data/iroom/calibrate/171.67.83.73/camera.xml", cv::FileStorage::READ);
+	cv::FileStorage f2("C:/Users/Zixuan/Dropbox/data/iroom/calibrate/171.67.83.75/camera.xml", cv::FileStorage::READ);
+	cv::Mat camera1, camera2, dist1, dist2, R1, R2, t1, t2;
+	f1["camera"] >> m_m1;
+	f1["dist"] >> dist1;
+	f1["r"] >> R1;
+	f1["t"] >> m_t1;
+	f2["camera"] >> m_m2;
+	f2["dist"] >> dist2;
+	f2["r"] >> R2;
+	f2["t"] >> m_t2;
+	f1.release();
+	f2.release();
+	cv::Mat image1 = cv::imread("C:/Users/Zixuan/Dropbox/data/iroom/annotate/171.67.83.73/fusion/empty.jpg");
+	cv::Mat image2 = cv::imread("C:/Users/Zixuan/Dropbox/data/iroom/annotate/171.67.83.75/fusion/empty.jpg");
+	m_correspond = cv::Mat(image1.rows, image1.cols + image2.cols, CV_8UC3, cv::Scalar(0));
+	image1.copyTo(m_correspond(cv::Rect(0, 0, image1.cols, image1.rows)));
+	image2.copyTo(m_correspond(cv::Rect(image1.cols, 0, image2.cols, image2.rows)));
+	cv::Rodrigues(R1, m_r1);
+	cv::Rodrigues(R2, m_r2);
+	m_mode = HEIGHT;
+	//cv::namedWindow("test");
+	//cv::imshow("test", correspond);
+	//cv::waitKey(0);
+}
+
+cv::Point2f Geometry::compute_correspondence(const cv::Point2f& point){
+	cv::Mat n1 = m_m1.inv();
+	cv::Mat q1 = m_r1.inv();
+	std::stringstream ss;
+	ss << m_r1 << std::endl;
+	ss << q1 << std::endl;
+	qDebug() << ss.str().c_str();
+	double* n1_ptr = (double*)n1.data;
+	double* q1_ptr = (double*)q1.data;
+	double* t1_ptr = (double*)m_t1.data;
+	double coeff = q1_ptr[6] * (n1_ptr[0] * point.x + n1_ptr[1] * point.y + n1_ptr[2]);
+	coeff += q1_ptr[7] * (n1_ptr[3] * point.x + n1_ptr[4] * point.y + n1_ptr[5]);
+	coeff += q1_ptr[8] * (n1_ptr[6] * point.x + n1_ptr[7] * point.y + n1_ptr[8]);
+	double h = 1.0;
+	double b = h + q1_ptr[6] * t1_ptr[0] + q1_ptr[7] * t1_ptr[1] + q1_ptr[8] * t1_ptr[2];
+	double s = b / coeff;
+	cv::Mat p1 = (cv::Mat_<double>(3, 1) << s * point.x, s * point.y , s);
+	cv::Mat P = q1 * (n1 * p1 - m_t1);
+	cv::Mat p2 = m_m2 * (m_r2 * P + m_t2);
+	double* p2_ptr = (double*)p2.data;
+	double s2 = p2_ptr[2];
+	cv::Point2f point2(p2_ptr[0] / s2, p2_ptr[1] / s2);
+	return point2;
+}
+
 void Geometry::annotate(const std::string& image_path1, const std::string& image_path2){
 	cv::Mat image1 = cv::imread(image_path1);
 	cv::Mat image2 = cv::imread(image_path2);
@@ -81,6 +133,16 @@ void Geometry::paintEvent(QPaintEvent*){
 			}
 		}
 	}
+	if(m_mode == HEIGHT){
+		if(!m_point_vector.empty()){
+			for(size_t i = 0; i < m_point_vector.size(); ++i){
+				painter.setPen(QPen(m_color_vector[i], 7));
+				painter.drawPoint(m_point_vector[i].x, m_point_vector[i].y);
+				cv::Point2f point = compute_correspondence(m_point_vector[i]);
+				painter.drawPoint(point.x + 640, point.y);
+			}
+		}
+	}
 }
 
 void Geometry::mousePressEvent(QMouseEvent* event){
@@ -100,6 +162,11 @@ void Geometry::mousePressEvent(QMouseEvent* event){
 		}else{
 			m_which_image = 2;
 		}
+		QColor color(rand() % 256, rand() % 256, rand() % 256);
+		m_color_vector.push_back(color);
+	}
+	if(m_mode == HEIGHT){
+		m_point_vector.push_back(cv::Point2f(event->pos().x(), event->pos().y()));
 		QColor color(rand() % 256, rand() % 256, rand() % 256);
 		m_color_vector.push_back(color);
 	}

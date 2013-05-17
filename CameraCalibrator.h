@@ -1,6 +1,6 @@
 #pragma once
 
-#include <opencv2/opencv.hpp>
+#include "Utility.h"
 
 class CameraCalibrator
 {
@@ -10,6 +10,7 @@ public:
 	int addChessboardPoints(const std::vector<std::string>& filelist, cv::Size& boardSize);
 	void addPoints(const std::vector<cv::Point2f>& imageCorners, const std::vector<cv::Point3f>& objectCorners);
 	double calibrate(cv::Size& imageSize);
+	void calibrate(const std::string& point_path, const std::string& filepath);
 	cv::Mat remap(const cv::Mat& image);
 	cv::Mat getCameraMatrix();
 	cv::Mat getDistCoeffs();

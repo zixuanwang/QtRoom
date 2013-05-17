@@ -2,6 +2,7 @@
 #define UTILITY_H
 
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <chrono>

@@ -9,9 +9,11 @@ class Geometry : public QWidget
 {
 	Q_OBJECT
 public:
-	enum{ANNOTATE, VALIDATE};
+	enum{ANNOTATE, VALIDATE, HEIGHT};
 	Geometry(void);
 	~Geometry(void);
+	void init_geometry();
+	cv::Point2f compute_correspondence(const cv::Point2f& point);
 	void annotate(const std::string& image_path1, const std::string& image_path2);
 	void load_fundamental_matrix(const std::string& filepath);
     bool line_intersect_line(const cv::Point& l1p1, const cv::Point& l1p2, const cv::Point& l2p1, const cv::Point& l2p2);
@@ -30,5 +32,12 @@ protected:
 	int m_mode;
 	std::vector<cv::Point2f> m_point_vector;
 	int m_which_image;
+	// for test
+	cv::Mat m_m1;
+	cv::Mat m_m2;
+	cv::Mat m_r1;
+	cv::Mat m_r2;
+	cv::Mat m_t1;
+	cv::Mat m_t2;
 };
 
