@@ -61,10 +61,10 @@ void MainWindow::init_actions(){
     m_action_motion_map->setCheckable(true);
     m_action_motion_map->setDisabled(true);
     connect(m_action_motion_map.get(), SIGNAL(toggled(bool)), this, SLOT(motion_map(bool)));
-    m_action_belief_map = std::shared_ptr<QAction>(new QAction("Belief Map", this));
-    m_action_belief_map->setCheckable(true);
-    m_action_belief_map->setDisabled(true);
-    connect(m_action_belief_map.get(), SIGNAL(toggled(bool)), this, SLOT(belief_map(bool)));
+    m_action_confidence_map = std::shared_ptr<QAction>(new QAction("Confidence Map", this));
+    m_action_confidence_map->setCheckable(true);
+    m_action_confidence_map->setDisabled(true);
+    connect(m_action_confidence_map.get(), SIGNAL(toggled(bool)), this, SLOT(confidence_map(bool)));
     m_action_train_hog = std::shared_ptr<QAction>(new QAction("Train HoG", this));
     connect(m_action_train_hog.get(), SIGNAL(triggered()), this, SLOT(train_hog()));
     m_action_prepare_cascade = std::shared_ptr<QAction>(new QAction("Prepare Cascade", this));
@@ -90,7 +90,7 @@ void MainWindow::init_menubar(){
     detectMenu->addAction(m_action_background_subtraction.get());
     detectMenu->addAction(m_action_optical_flow.get());
     detectMenu->addAction(m_action_motion_map.get());
-    detectMenu->addAction(m_action_belief_map.get());
+    detectMenu->addAction(m_action_confidence_map.get());
     detectMenu->addSeparator();
     detectMenu->addAction(m_action_walnut_detection.get());
     QMenu* trainMenu = menuBar()->addMenu(tr("&Train"));
@@ -140,7 +140,7 @@ void MainWindow::enable_buttons(){
     m_action_background_subtraction->setDisabled(false);
     m_action_optical_flow->setDisabled(false);
     m_action_motion_map->setDisabled(false);
-    m_action_belief_map->setDisabled(false);
+    m_action_confidence_map->setDisabled(false);
     m_action_walnut_detection->setDisabled(false);
 }
 
@@ -203,9 +203,9 @@ void MainWindow::motion_map(bool run){
     }
 }
 
-void MainWindow::belief_map(bool run){
+void MainWindow::confidence_map(bool run){
     for(size_t i = 0; i < m_camera_view_vector.size(); ++i){
-        m_camera_view_vector[i]->set_mode(run ? CameraView::BELIEF_MAP : CameraView::NORMAL);
+        m_camera_view_vector[i]->set_mode(run ? CameraView::CONFIDENCE_MAP : CameraView::NORMAL);
     }
 }
 

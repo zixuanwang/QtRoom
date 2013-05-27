@@ -30,7 +30,9 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
     }
     geometry_filter(bbox);
     merge(bbox);
-    compute_belief(bbox);
+	temporal_propagation(bbox);
+    Fusion::instance()->spatial_propagation();
+	//compute_confidence(bbox);
     if(m_count_list.size() > 20){
         m_count_list.pop_front();
     }
@@ -72,42 +74,19 @@ void WalnutDetector::geometry_filter(std::vector<cv::Rect>& bbox){
     }
 }
 
-void WalnutDetector::temporal_filter(std::vector<cv::Rect>& bbox){
-    if(bbox.empty())
-        return;
-    if(m_temporal_record.empty())
-        m_temporal_record = cv::Mat(480, 640, CV_16UC1, cv::Scalar(0));
-    std::vector<cv::Rect> filter_box;
-    for(size_t i = 0; i < bbox.size(); ++i){
-        cv::Mat subfilter = m_temporal_record(bbox[i]);
-        for(int row = 0; row < subfilter.rows; ++row){
-            unsigned short *row_ptr = subfilter.ptr<unsigned short>(row);
-            for(int col = 0; col < subfilter.cols; ++col){
-                row_ptr[col] <<= 1;
-            }
-        }
-        subfilter += 1;
-    }
-    cv::Mat binary_image(m_temporal_record.size(), CV_8UC1, cv::Scalar(0));
-    for(int row = 0; row < m_temporal_record.rows; ++row){
-        for(int col = 0; col < m_temporal_record.cols; ++col){
-            std::bitset<16> bits(m_temporal_record.at<unsigned short>(row, col));
-            if(bits.count() >= 6){
-                binary_image.at<uchar>(row, col) = 1;
-            }
-        }
-    }
-    std::vector<std::vector<cv::Point> > contours;
-    cv::findContours(binary_image, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-    for(size_t i = 0; i < contours.size(); ++i){
-        filter_box.push_back(cv::boundingRect(contours[i]));
-    }
-    bbox.assign(filter_box.begin(), filter_box.end());
+void WalnutDetector::temporal_propagation(const std::vector<cv::Rect>& bbox){
+	for(auto &p : m_confidence){
+		p.second *= 0.9f;
+	}
+	for(const cv::Rect& rect : bbox){
+		std::pair<int, int> p(rect.x + rect.width / 2, rect.y + rect.height / 2);
+		m_confidence[p] = 1.f;
+	}
 }
 
-void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
-    if(m_belief_map.empty()){
-        m_belief_map = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_32FC1, cv::Scalar(0));
+void WalnutDetector::compute_confidence(std::vector<cv::Rect>& bbox){
+    if(m_confidence_map.empty()){
+        m_confidence_map = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_32FC1, cv::Scalar(0));
     }
     cv::Mat object_binary = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_32FC1, cv::Scalar(0));
     for(size_t i = 0; i < bbox.size(); ++i){
@@ -117,9 +96,9 @@ void WalnutDetector::compute_belief(std::vector<cv::Rect>& bbox){
         sub_object_binary += gaussian;
     }
     m_belief_map_list.push_back(object_binary);
-    m_belief_map += object_binary;
+    m_confidence_map += object_binary;
     if(m_belief_map_list.size() > 20){
-        m_belief_map -= m_belief_map_list.front();
+        m_confidence_map -= m_belief_map_list.front();
         m_belief_map_list.pop_front();
     }
 }
@@ -147,7 +126,7 @@ void WalnutDetector::merge(std::vector<cv::Rect>& bbox){
     std::vector<cv::Rect> merge_bbox;
     merge_bbox.reserve(bbox.size());
     for(auto box : bbox){
-        cv::meanShift(m_belief_map, box, cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 50, 1.0));
+        cv::meanShift(m_confidence_map, box, cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 50, 1.0));
         merge_bbox.push_back(box);
     }
     std::vector<int> labels;
@@ -168,4 +147,37 @@ void WalnutDetector::merge(std::vector<cv::Rect>& bbox){
         rrects[i] = cv::Rect(r.x * s, r.y * s, r.width * s, r.height * s);
     }
     bbox.assign(rrects.begin(), rrects.end());
+}
+
+void WalnutDetector::temporal_filter(std::vector<cv::Rect>& bbox){
+	if(bbox.empty())
+		return;
+	if(m_temporal_record.empty())
+		m_temporal_record = cv::Mat(480, 640, CV_16UC1, cv::Scalar(0));
+	std::vector<cv::Rect> filter_box;
+	for(size_t i = 0; i < bbox.size(); ++i){
+		cv::Mat subfilter = m_temporal_record(bbox[i]);
+		for(int row = 0; row < subfilter.rows; ++row){
+			unsigned short *row_ptr = subfilter.ptr<unsigned short>(row);
+			for(int col = 0; col < subfilter.cols; ++col){
+				row_ptr[col] <<= 1;
+			}
+		}
+		subfilter += 1;
+	}
+	cv::Mat binary_image(m_temporal_record.size(), CV_8UC1, cv::Scalar(0));
+	for(int row = 0; row < m_temporal_record.rows; ++row){
+		for(int col = 0; col < m_temporal_record.cols; ++col){
+			std::bitset<16> bits(m_temporal_record.at<unsigned short>(row, col));
+			if(bits.count() >= 6){
+				binary_image.at<uchar>(row, col) = 1;
+			}
+		}
+	}
+	std::vector<std::vector<cv::Point> > contours;
+	cv::findContours(binary_image, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+	for(size_t i = 0; i < contours.size(); ++i){
+		filter_box.push_back(cv::boundingRect(contours[i]));
+	}
+	bbox.assign(filter_box.begin(), filter_box.end());
 }

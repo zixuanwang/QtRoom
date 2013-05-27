@@ -52,7 +52,7 @@ void CameraView::set_mode(MODE mode){
         if(m_cascade_detector == nullptr)
             m_cascade_detector = std::shared_ptr<CascadeDetector>(new CascadeDetector(ss.str()));
     }
-    if(m_mode == WALNUT || m_mode == BELIEF_MAP){
+    if(m_mode == WALNUT || m_mode == CONFIDENCE_MAP){
         if(m_walnut_detector == nullptr)
             m_walnut_detector = std::shared_ptr<WalnutDetector>(new WalnutDetector(ss.str()));
     }
@@ -99,11 +99,11 @@ cv::Mat CameraView::process_image(cv::Mat& frame_buffer){
         motion_map.convertTo(gray_motion_map, CV_8UC1, 10.0);
         cv::cvtColor(gray_motion_map, image, CV_GRAY2BGR);
     }
-    if(m_mode == BELIEF_MAP){
+    if(m_mode == CONFIDENCE_MAP){
         std::vector<cv::Rect> rect_vector;
         m_walnut_detector->detect(image, rect_vector);
         m_walnut_detector->draw(image, rect_vector);
-        cv::Mat belief_map = m_walnut_detector->get_belief_map();
+        cv::Mat belief_map = m_walnut_detector->get_confidence_map();
         cv::Mat normalize_belief_map;
         belief_map.convertTo(normalize_belief_map, CV_8UC1, 10.0);
         cv::cvtColor(normalize_belief_map, image, CV_GRAY2BGR);

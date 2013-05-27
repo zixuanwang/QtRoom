@@ -150,6 +150,7 @@
     <ClCompile Include="Classifier.cpp" />
     <ClCompile Include="ColorDescriptor.cpp" />
     <ClCompile Include="FeatureDescriptor.cpp" />
+    <ClCompile Include="Fusion.cpp" />
     <ClCompile Include="FusionLayer.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_Camera.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -231,6 +232,7 @@
     <ClInclude Include="Classifier.h" />
     <ClInclude Include="ColorDescriptor.h" />
     <ClInclude Include="FeatureDescriptor.h" />
+    <ClInclude Include="Fusion.h" />
     <ClInclude Include="FusionLayer.h" />
     <ClInclude Include="GeneratedFiles\ui_mainwindow.h" />
     <CustomBuild Include="Geometry.h">

@@ -143,6 +143,9 @@
     <ClCompile Include="CameraCalibrator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Fusion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Camera.h">
@@ -223,6 +226,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="CameraCalibrator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fusion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
