@@ -16,6 +16,7 @@ protected:
 private:
     std::vector<cv::Point2f> m_point_vector;
     static Layout* p_instance;
+    std::list<std::vector<cv::Point2f> > m_point_vector_list;
 };
 
 #endif // LAYOUT_H
