@@ -4,6 +4,7 @@
 #include "CameraView.h"
 #include "Geometry.h"
 #include "HoGDescriptor.h"
+#include "Layout.h"
 #include <memory>
 #include <QDate>
 #include <QFileDialog>
@@ -47,6 +48,7 @@ public slots:
     void stop_recording();
     void train_hog();
     void prepare_cascade();
+    void show_layout();
     void about();
 private:
     void init_actions();
@@ -74,6 +76,7 @@ private:
     std::shared_ptr<QAction> m_action_train_hog;
     std::shared_ptr<QAction> m_action_prepare_cascade;
     std::shared_ptr<QAction> m_action_walnut_detection;
+    std::shared_ptr<QAction> m_action_layout;
     std::shared_ptr<QAction> m_action_exit;
     std::shared_ptr<QAction> m_action_about;
     std::shared_ptr<QTimer> m_status_timer;

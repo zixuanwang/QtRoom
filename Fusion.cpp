@@ -18,7 +18,7 @@ void Fusion::init(){
 	for(auto &ip : m_ip_vector)
 	for(size_t i = 0; i < m_ip_vector.size(); ++i){
 		std::stringstream ss;
-		ss << "C:/Users/Zixuan/Dropbox/data/iroom/calibrate/" << ip << "/camera.xml";
+        ss << GlobalConfig::CALIBRATE_PATH << "/" << ip << "/camera.xml";
 		cv::FileStorage f(ss.str(), cv::FileStorage::READ);
 		cv::Mat R,r,t,A;
 		f["camera"] >> A;
@@ -33,15 +33,32 @@ void Fusion::init(){
 }
 
 void Fusion::spatial_propagation(){
+    // propagate 75 and 76 to 73.
 
+}
+
+cv::Point3f Fusion::convert_3d(const std::string& ip, const cv::Point2f& point, float height){
+    cv::Mat n1 = m_mat_map[ip][2].inv();
+    cv::Mat q1 = m_mat_map[ip][0].inv();
+    double* n1_ptr = (double*)n1.data;
+    double* q1_ptr = (double*)q1.data;
+    double* t1_ptr = (double*)m_mat_map[ip][1].data;
+    double coeff = q1_ptr[6] * (n1_ptr[0] * point.x + n1_ptr[1] * point.y + n1_ptr[2]);
+    coeff += q1_ptr[7] * (n1_ptr[3] * point.x + n1_ptr[4] * point.y + n1_ptr[5]);
+    coeff += q1_ptr[8] * (n1_ptr[6] * point.x + n1_ptr[7] * point.y + n1_ptr[8]);
+    double h = (double) height;
+    double b = h + q1_ptr[6] * t1_ptr[0] + q1_ptr[7] * t1_ptr[1] + q1_ptr[8] * t1_ptr[2];
+    double s = b / coeff;
+    cv::Mat p1 = (cv::Mat_<double>(3, 1) << s * point.x, s * point.y , s);
+    cv::Mat P = q1 * (n1 * p1 - m_mat_map[ip][1]);
+    double* P_ptr = P.ptr<double>(0);
+    cv::Point3f ret(P_ptr[0], P_ptr[1], P_ptr[2]);
+    return ret;
 }
 
 cv::Point2f Fusion::compute_correspondence(const std::string& ip1, const std::string& ip2, const cv::Point2f& point){
 	cv::Mat n1 = m_mat_map[ip1][2].inv();
 	cv::Mat q1 = m_mat_map[ip1][0].inv();
-	std::stringstream ss;
-	ss << q1 << std::endl;
-	qDebug() << ss.str().c_str();
 	double* n1_ptr = (double*)n1.data;
 	double* q1_ptr = (double*)q1.data;
 	double* t1_ptr = (double*)m_mat_map[ip1][1].data;
@@ -62,4 +79,35 @@ cv::Point2f Fusion::compute_correspondence(const std::string& ip1, const std::st
 
 void Fusion::set_walnut_detector(const std::string& ip, const std::shared_ptr<WalnutDetector>& detector){
 	m_detector_map[ip] = detector;
+}
+
+void merge(boost::unordered_map<std::pair<int, int>, float>& confidence){
+    if(confidence.size() < 2){
+        return;
+    }
+    float min_distance = FLT_MAX;
+    boost::unordered_map<std::pair<int, int>, float>::iterator iter_i, iter_j;
+    for(auto i = confidence.begin(); i != confidence.end(); ++i){
+        auto j = i;
+        ++j;
+        for(; j != confidence.end(); ++j){
+            float dx = (float)i->first.first - j->first.first;
+            float dy = (float)i->first.second - j->first.second;
+            float distance = dx * dx + dy * dy;
+            if(distance < min_distance){
+                min_distance = distance;
+                iter_i = i;
+                iter_j = j;
+            }
+        }
+    }
+    if(min_distance < 30.f){
+        std::pair<int, int> p;
+        p.first = (iter_i->first.first + iter_j->first.first) / 2;
+        p.second = (iter_i->first.second + iter_j->first.second) / 2;
+        confidence[p] = std::max(iter_i->second, iter_j->second); // max aggregation.
+        confidence.erase(iter_i->first);
+        confidence.erase(iter_j->first);
+        merge(confidence);
+    }
 }

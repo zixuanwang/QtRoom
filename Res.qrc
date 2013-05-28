@@ -12,5 +12,8 @@
         <file>food-kiwi.png</file>
         <file>document-sign-2.png</file>
         <file>draw-path.png</file>
+        <file>zoom-original-2.png</file>
+        <file>iroom_layout.png</file>
+        <file>im-user.png</file>
     </qresource>
 </RCC>

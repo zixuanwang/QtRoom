@@ -27,6 +27,7 @@ void MainWindow::init_actions(){
     QPixmap background_pix(":/new/my_resources/tab-detach.png");
     QPixmap optical_flow_pix(":/new/my_resources/tools-wizard-3.png");
     QPixmap walnut_pix(":/new/my_resources/food-kiwi.png");
+    QPixmap layout_pix(":/new/my_resources/zoom-original-2.png");
     m_action_load_config = std::shared_ptr<QAction>(new QAction(QIcon(new_pix), "Load Config", this));
     m_action_load_config->setShortcut(tr("Ctrl+N"));
     connect(m_action_load_config.get(), SIGNAL(triggered()), this, SLOT(pick_config()));
@@ -73,6 +74,8 @@ void MainWindow::init_actions(){
     m_action_walnut_detection->setCheckable(true);
     m_action_walnut_detection->setDisabled(true);
     connect(m_action_walnut_detection.get(), SIGNAL(toggled(bool)), this, SLOT(walnut_detection(bool)));
+    m_action_layout = std::shared_ptr<QAction>(new QAction(QIcon(layout_pix), "Show Layout", this));
+    connect(m_action_layout.get(), SIGNAL(triggered()), this, SLOT(show_layout()));
     m_action_about = std::shared_ptr<QAction>(new QAction("About", this));
     connect(m_action_about.get(), SIGNAL(triggered()), this, SLOT(about()));
 }
@@ -112,6 +115,7 @@ void MainWindow::init_toolbar(){
     toolbar->addAction(m_action_background_subtraction.get());
     toolbar->addAction(m_action_optical_flow.get());
     toolbar->addAction(m_action_walnut_detection.get());
+    toolbar->addAction(m_action_layout.get());
 }
 
 void MainWindow::init_widgets(){
@@ -282,6 +286,10 @@ void MainWindow::prepare_cascade(){
         Trainer::train_cascade(dir.toStdString());
         QMessageBox::information(this, "Preparation Finished", "Please run opencv_createsamples and opencv_traincascade");
     }
+}
+
+void MainWindow::show_layout(){
+    Layout::instance()->show();
 }
 
 void MainWindow::about(){

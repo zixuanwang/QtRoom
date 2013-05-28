@@ -5,6 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <boost/unordered_map.hpp>
 #include <chrono>
 #include <fstream>
 #include "GlobalConfig.h"

@@ -32,6 +32,7 @@ void WalnutDetector::detect(const cv::Mat& image, std::vector<cv::Rect>& bbox){
     merge(bbox);
 	temporal_propagation(bbox);
     Fusion::instance()->spatial_propagation();
+    draw_confidence_map();
 	//compute_confidence(bbox);
     if(m_count_list.size() > 20){
         m_count_list.pop_front();
@@ -75,6 +76,7 @@ void WalnutDetector::geometry_filter(std::vector<cv::Rect>& bbox){
 }
 
 void WalnutDetector::temporal_propagation(const std::vector<cv::Rect>& bbox){
+    // TODO:
 	for(auto &p : m_confidence){
 		p.second *= 0.9f;
 	}
@@ -100,6 +102,17 @@ void WalnutDetector::compute_confidence(std::vector<cv::Rect>& bbox){
     if(m_belief_map_list.size() > 20){
         m_confidence_map -= m_belief_map_list.front();
         m_belief_map_list.pop_front();
+    }
+}
+
+void WalnutDetector::draw_confidence_map(){
+    m_confidence_map = cv::Mat(GlobalConfig::FULL_HEIGHT, GlobalConfig::FULL_WIDTH, CV_32FC1, cv::Scalar(0));
+    cv::Mat gaussian;
+    cv::resize(m_gaussian_template, gaussian, cv::Size(64, 64));
+    for(auto &p : m_confidence){
+        cv::Rect rect(p.first.first - 32, p.first.second - 32, 64, 64);
+        cv::Mat shift = m_confidence_map(rect);
+        shift += gaussian * p.second;
     }
 }
 

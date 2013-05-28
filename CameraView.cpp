@@ -79,6 +79,10 @@ cv::Mat CameraView::process_image(cv::Mat& frame_buffer){
         std::vector<cv::Rect> rect_vector;
         m_walnut_detector->detect(image, rect_vector);
         m_walnut_detector->draw(image, rect_vector);
+        // show_layout
+        if(m_id == "171.67.83.73"){
+            Layout::instance()->set_rect_vector(rect_vector);
+        }
     }
     if(m_mode == BACKGROUND){
         cv::Mat foreground;
@@ -102,10 +106,9 @@ cv::Mat CameraView::process_image(cv::Mat& frame_buffer){
     if(m_mode == CONFIDENCE_MAP){
         std::vector<cv::Rect> rect_vector;
         m_walnut_detector->detect(image, rect_vector);
-        m_walnut_detector->draw(image, rect_vector);
-        cv::Mat belief_map = m_walnut_detector->get_confidence_map();
+        cv::Mat confidence_map = m_walnut_detector->get_confidence_map();
         cv::Mat normalize_belief_map;
-        belief_map.convertTo(normalize_belief_map, CV_8UC1, 10.0);
+        confidence_map.convertTo(normalize_belief_map, CV_8UC1, 100.0);
         cv::cvtColor(normalize_belief_map, image, CV_GRAY2BGR);
     }
     cv::Mat preview_image;

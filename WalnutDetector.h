@@ -25,6 +25,7 @@ public:
     void geometry_filter(std::vector<cv::Rect>& bbox); // use the geometry of the camera to filter bounding boxes which are too large or too small.
     void temporal_propagation(const std::vector<cv::Rect>& bbox); // this function will modify the confidence map.
     void compute_confidence(std::vector<cv::Rect>& bbox); // clustering using minshift.
+    void draw_confidence_map(); // for visualization.
     cv::Mat get_confidence_map(){return m_confidence_map;}
     void draw(cv::Mat& image, const std::vector<cv::Rect>& bbox);
     std::pair<int, float> get_count_belief();
@@ -42,7 +43,6 @@ private:
     MotionDescriptor m_motion_descriptor;
     SVMClassifier m_svm_classifier;
 	boost::unordered_map<std::pair<int, int>, float> m_confidence;
-
     cv::Mat m_confidence_map;
     std::list<cv::Mat> m_belief_map_list;
     cv::Mat m_temporal_record; // each pixel records the count of this pixel classified as people in recent 16 frames.

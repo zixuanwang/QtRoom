@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "CameraCalibrator.h"
 #include "GlobalConfig.h"
+#include "Layout.h"
 #include "PeoplePlot.h"
 #include <QAction>
 #include <QLabel>

@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     ParticleFilter.cpp \
     FusionLayer.cpp \
     Geometry.cpp \
-    Graph.cpp
+    Graph.cpp \
+    Fusion.cpp \
+    Layout.cpp
 
 HEADERS  += mainwindow.h \
     Camera.h \
@@ -57,7 +59,9 @@ HEADERS  += mainwindow.h \
     ParticleFilter.h \
     FusionLayer.h \
     Geometry.h \
-    Graph.h
+    Graph.h \
+    Fusion.h \
+    Layout.h
 
 FORMS    += mainwindow.ui
 
