@@ -83,6 +83,7 @@ cv::Mat CameraView::process_image(cv::Mat& frame_buffer){
         if(m_id == "171.67.83.73"){
             Layout::instance()->set_rect_vector(rect_vector);
         }
+        save_detection(rect_vector);
     }
     if(m_mode == BACKGROUND){
         cv::Mat foreground;
@@ -115,6 +116,21 @@ cv::Mat CameraView::process_image(cv::Mat& frame_buffer){
     cv::resize(image, preview_image, cv::Size(width(), height()));
     return preview_image;
 }
+
+ void CameraView::save_detection(const std::vector<cv::Rect>& rect_vector){
+     std::ofstream output_stream;
+     output_stream.open(GlobalConfig::OUTPUT_PATH + "/" + m_id + ".txt", std::ios::app);
+     if(output_stream.good()){
+         // output timestamp
+         auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+         output_stream << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << std::endl;
+         output_stream << rect_vector.size() << std::endl;
+         for(size_t i = 0; i < rect_vector.size(); ++i){
+             output_stream << rect_vector[i].x << "\t" << rect_vector[i].y << "\t" << rect_vector[i].width << "\t" << rect_vector[i].height << std::endl;
+         }
+         output_stream.close();
+     }
+ }
 
 bool CameraView::event(QEvent* event){
     if(event->type() == QEvent::ToolTip){

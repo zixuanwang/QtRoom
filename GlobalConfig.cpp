@@ -9,6 +9,7 @@ const int GlobalConfig::TRAIN_PATCH_WIDTH = 64;
 const int GlobalConfig::TRAIN_PATCH_HEIGHT = 64;
 const std::string GlobalConfig::ANNOTATE_PATH = "/home/zxwang/Dropbox/data/iroom/annotate";
 const std::string GlobalConfig::CALIBRATE_PATH = "/home/zxwang/Dropbox/data/iroom/calibrate";
+const std::string GlobalConfig::OUTPUT_PATH = "/home/zxwang/Dropbox/data/iroom/output";
 
 
 GlobalConfig::GlobalConfig()

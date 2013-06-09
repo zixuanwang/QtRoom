@@ -18,6 +18,7 @@ public:
     const static int TRAIN_PATCH_HEIGHT;
     const static std::string ANNOTATE_PATH;
     const static std::string CALIBRATE_PATH;
+    const static std::string OUTPUT_PATH;
 };
 
 #endif // GLOBALCONFIG_H

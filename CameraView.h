@@ -32,6 +32,7 @@ public:
     void start_recording(const std::string& video_directory);
     void stop_recording();
     cv::Mat process_image(cv::Mat& image); // the major function to analyse the image.
+    void save_detection(const std::vector<cv::Rect>& rect_vector); // save detection to the file
     virtual ~CameraView();
 protected:
     bool event(QEvent *);
